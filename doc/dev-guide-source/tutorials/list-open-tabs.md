@@ -2,21 +2,15 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# List Open Tabs #
+# 開いているタブの一覧表示 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To list the open tabs, you can iterate over the
-[`tabs`](packages/addon-kit/tabs.html) object itself.
+開いているタブを一覧表示するには、[`tabs`](packages/addon-kit/tabs.html) オブジェクトを反復処理します。
 
-The following add-on adds a
-[`widget`](packages/addon-kit/widget.html) that logs
-the URLs of open tabs when the user clicks it:
+以下のアドオンは、ユーザーがクリックしたときに、開いているタブの URL をログとして出力する[ウィジェット](packages/addon-kit/widget.html) を追加します。
 
     var widget = require("widget").Widget({
       id: "mozilla-link",
@@ -31,19 +25,14 @@ the URLs of open tabs when the user clicks it:
         console.log(tab.url);
     }
 
-If you run the add-on, load a couple of tabs, and click the
-widget, you'll see output in the
-[console](dev-guide/console.html) that looks like this:
+このアドオンを実行し、タブを 2、3 個読み込み、ウィジェットをクリックすると、[コンソール](dev-guide/console.html)に以下のような出力が表示されます。
 
 <pre>
 info: http://www.mozilla.org/en-US/about/
 info: http://www.bbc.co.uk/
 </pre>
 
-You don't get direct access to any content hosted in the tab.
-To access tab content you need to attach a script to the tab
-using `tab.attach()`. This add-on attaches a script to all open
-tabs. The script adds a red border to the tab's document:
+このタブでホストされるコンテンツには直接アクセスできません。タブのコンテンツにアクセスするには、`tab.attach()` を使用してタブにスクリプトを付加する必要があります。以下のアドオンは、開いているすべてのタブにスクリプトを付加します。付加されたスクリプトは、タブの文書に赤い枠を追加します。
 
     var widget = require("widget").Widget({
       id: "mozilla-link",
@@ -64,10 +53,8 @@ tabs. The script adds a red border to the tab's document:
       });
     }
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about working with tabs in the SDK, see the
-[`tabs` API reference](packages/addon-kit/tabs.html).
+SDK でのタブの操作方法の詳細については、[API リファレンス：`tabs`（英語）](packages/addon-kit/tabs.html)を参照してください。
 
-To learn more about running scripts in tabs, see the
-[tutorial on using `tab.attach()`](dev-guide/tutorials/modifying-web-pages-tab.html).
+タブでスクリプトを実行する方法の詳細については、[`tab.attach()` の使用方法についてのチュートリアル](dev-guide/tutorials/modifying-web-pages-tab.html)を参照してください。

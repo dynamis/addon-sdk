@@ -2,39 +2,21 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Unit Testing #
+# 単体テスト #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html),
-learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html),
-and followed the tutorial on
-[writing reusable modules](dev-guide/tutorials/reusable-modules.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)および[再利用可能なモジュールの作成](dev-guide/tutorials/reusable-modules.html)のチュートリアルを学習してください。
 </span>
 
-The SDK provides a framework to help creates and run unit tests for
-your code. To demonstrate how it works we'll write some unit tests for
-a simple [Base64](http://en.wikipedia.org/wiki/Base64) encoding module.
+SDK では、コードの単体テストの作成と実行を支援するフレームワークが提供されています。ここでは、このフレームワークの機能を理解するために、単純な [Base64](http://en.wikipedia.org/wiki/Base64) エンコードモジュール用の単体テストを作成します。
 
-## A Simple Base64 Module ##
+## 単純な Base64 モジュール ##
 
-In a web page, you can perform Base64 encoding and decoding using the
-`btoa()` and `atob()` functions. Unfortunately these functions are attached
-to the `window` object: since this object is not available in your
-main add-on code, `atob()` and `btoa()` aren't available either. Using the
-low-level
-[window-utils](packages/api-utils/window-utils.html) module you
-can access `window`, enabling you to call these functions.
+Web ページでは、`btoa()` 関数と `atob()` 関数を使用して、Base64 のエンコードとデコードを実行できます。しかし残念なことにこれらの関数は `window` オブジェクトに付加され、`window` オブジェクトはメインのアドオンコードで使用できないため、`atob()` と `btoa()` もメインのアドオンコードで使用できません。低レベルの [window-utils](packages/api-utils/window-utils.html) モジュールを使用して、`window` にアクセスし、これらの関数を呼び出すことは可能です。
 
-However, it's good practice to encapsulate the code that directly accesses
-`window-utils` in its own module, and only export the `atob()`
-and `btoa()` functions. So we'll create a Base64 module to do
-exactly that.
+しかし、`window-utils` に直接アクセスするコードを別のモジュールとしてカプセル化し、`atob()` 関数と `btoa()` 関数のみをエクスポートする方が適切な方法です。そこでここでは、それを行う Base64 モジュールを作成します。
 
-To begin with, create a new directory, navigate to it, and run `cfx init`.
-Now create a new file in "lib" called "base64.js", and give it the
-following contents:
+まず新しいディレクトリを作成し、そのディレクトリに移動して `cfx init` を実行します。「lib」に「base64.js」という名前の新しいファイルを作成し、以下の内容をコピーします。
 
     var window = require("window-utils").activeBrowserWindow;
 
@@ -46,9 +28,7 @@ following contents:
       return window.btoa(b);
     }
 
-This code exports two functions, which just call the corresponding
-functions on the `window` object. To show the module in use, edit
-the "main.js" file as follows:
+このコードは 2 つの関数をエクスポートし、それらの関数が `window` オブジェクトの対応する関数を呼び出します。モジュールの動作を確認するため、「main.js」ファイルを以下のように編集してください。
 
     var widgets = require("widget");
     var base64 = require("base64");
@@ -65,20 +45,16 @@ the "main.js" file as follows:
       }
     });
 
-Now "main.js" imports the base64 module and calls its two exported
-functions. If we run the add-on and click the widget, we should see
-the following logging output:
+これで「main.js」は base64 モジュールをインポートし、それがエクスポートする 2 つの関数を呼び出すようになりました。このアドオンを実行し、ウィジェットをクリックすると、以下のログ出力が表示されます。
 
 <pre>
 info: aGVsbG8=
 info: hello
 </pre>
 
-## Testing the Base64 Module ##
+## 作成した Base64 モジュールのテスト ##
 
-Navigate to the add-on's `test` directory and delete the `test-main.js` file.
-In its place create a file called `test-base64.js` with the following
-contents:
+アドオンの `test` ディレクトリに移動し、`test-main.js` ファイルを削除します。このファイルの代わりに `test-base64.js` というファイルを作成し、以下の内容をコピーします。
 
 <pre><code>
 var base64 = require("base64")
@@ -105,20 +81,13 @@ exports.test_btoa = test_btoa;
 exports.test_empty_string = test_empty_string;
 </code></pre>
 
-This file: exports three functions, each of which expects to receive a single
-argument which is a `test` object. `test` is supplied by the
-[`unit-test`](packages/api-utils/unit-test.html) module and provides
-functions to simplify unit testing.
+このファイルでは 3 つの関数が呼び出され、それぞれが `test` オブジェクトである引数を 1 つずつ受け取ります。`test` は [`unit-test`](packages/api-utils/unit-test.html) モジュールによって提供され、単体テストを簡単に実行するための関数を提供します。
 
-* The first two functions call `atob()` and `btoa()` and use [`test.assertEqual()`](packages/api-utils/unit-test.html#assertEqual(a, b, message))
-to check that the output is as expected.
+* 最初の 2 つの関数は `atob()` と `btoa()` を呼び出し、[`test.assertEqual()`](packages/api-utils/unit-test.html#assertEqual(a, b, message)) を使用して予期したとおりの出力が得られることを確認します。
 
-* The second function tests the module's error-handling code by passing an
-empty string into `atob()` and using
-[`test.assertRaises()`](packages/api-utils/unit-test.html#assertRaises(func, predicate, message))
-to check that the expected exception is raised.
+* 3 番目の test_empty_string 関数は、モジュールのエラー処理コードのテストとして、空の文字列を `atob()` に渡し、[`test.assertRaises()`](packages/api-utils/unit-test.html#assertRaises(func, predicate, message)) を使用して予期したとおりに例外が発生することを確認します。
 
-At this point your add-on ought to look like this:
+この時点で、アドオンは以下のようになります。
 
 <pre>
   /base64
@@ -133,8 +102,7 @@ At this point your add-on ought to look like this:
           test-base64.js
 </pre>
 
-Now execute `cfx --verbose test` from the add-on's root directory.
-You should see something like this:
+ここでアドオンのルートディレクトリから、`cfx --verbose test` を実行します。以下のような出力が表示されます。
 
 <pre>
 Running tests on Firefox 10.0/Gecko 10.0 ({ec8030f7-c20a-464f-9b0e-13a3a9e97384}) under darwin/x86.
@@ -150,17 +118,12 @@ Total time: 1.691787 seconds
 Program terminated successfully.
 </pre>
 
-What happens here is that `cfx test`:
+ここでの `cfx test` の動作は以下のとおりです。
 
-<span class="aside">Note the hyphen after "test" in the module name.
-`cfx test` will include a module called "test-myCode.js", but will exclude
-modules called "test_myCode.js" or "testMyCode.js".</span>
+<span class="aside">モジュール名の「test」の後にハイフンが付いていることに注意してください。例えば「test-myCode.js」というモジュールは `cfx test` に読み込まれますが、「test_myCode.js」や「testMyCode.js」は読み込まれません。</span>
 
-* looks in the `test` directory of your
-package
-* loads any modules whose names start with the word `test-`
-*  calls all their exported functions, passing them a `test` object
-implementation as their only argument.
+* パッケージの `test` ディレクトリを調べます。
+* 名前が `test-` で始まるすべてのモジュールを読み込みます。
+*  それらのモジュールによってエクスポートされるすべての関数を呼び出します。このとき、`test` オブジェクトの実装を唯一の引数として渡します。
 
-Obviously, you don't have to pass the `--verbose` option to `cfx` if you don't
-want to; doing so just makes the output easier to read.
+もちろん、`--verbose` オプションを `cfx` に渡すことは必須ではありませんが、このオプションを使用すると出力がわかりやすくなります。

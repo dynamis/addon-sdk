@@ -2,21 +2,15 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Modifying the Page Hosted by a Tab #
+# タブにホストされているページコンテンツの変更 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To modify the page hosted by a particular tab, load a script into it
-using the `attach()` method of the
-[tab](packages/addon-kit/tabs.html) object. Because their job is
-to interact with web content, these scripts are called *content scripts*.
+特定のタブによってホストされるページを変更するには、[tab](packages/addon-kit/tabs.html) オブジェクトの `attach()` メソッドを使用して、対象のページにスクリプトを読み込みます。このスクリプトは Web コンテンツとのやりとりを目的としているので、*コンテンツスクリプト*と呼ばれます。
 
-Here's a simple example:
+以下に単純な例を示します。
 
     var widgets = require("widget");
     var tabs = require("tabs");
@@ -33,41 +27,33 @@ Here's a simple example:
         }
     });
 
-This add-on creates a widget which contains the Mozilla favicon as an icon.
-It has a click handler which fetches the active tab and loads a
-script into the page hosted by the active tab. The script is specified using
-`contentScript` option, and just draws
-a red border around the page. Try it out:
+このアドオンでは、Mozilla ファビコンをアイコンとするウィジェットが作成されます。このウィジェットにあるクリックハンドラは、アクティブなタブを取得し、アアクティブなタブにホストされているページにスクリプトを読み込ませます。スクリプトは `contentScript` オプションで指定され、上記の例では、ページの周囲に赤い枠を表示する処理を行っています。演習：
 
-* create a new directory and navigate to it
-* run `cfx init`
-* open the `lib/main.js` file, and add the code above
-* run `cfx run`, then run `cfx run` again
+* 新しいディレクトリを作成し、そのディレクトリに移動します。
+* `cfx init` を実行します。
+* `lib/main.js` ファイルを開き、その内容を上のコードと置き換えます。
+* `cfx run` を実行した後、`cfx run` を再度実行します。
 
-You should see the Mozilla icon appear in the bottom-right corner of the
-browser:
+下の図のように、ブラウザの右下隅に Mozilla アイコンが表示されます。
 
 <img class="image-center" src="static-files/media/screenshots/widget-mozilla.png"
 alt="Mozilla icon widget" />
 
-Then open any web page in the browser window that opens, and click the
-Mozilla icon. You should see a red border appear around the page, like this:
+次に、同ブラウザ上で任意のページを開き、この Mozilla アイコンをクリックします。 
+以下の図のように、ページの周囲に赤い枠が表示されます。
 
 <img class="image-center" src="static-files/media/screenshots/tabattach-bbc.png"
 alt="bbc.co.uk modded by tab.attach" />
 
-## Keeping the Content Script in a Separate File ##
+## 別ファイルでのコンテンツスクリプトの管理 ##
 
-In the example above we've passed in the content script as a string. Unless
-the script is extremely simple, you should instead maintain the script as a
-separate file. This makes the code easier to maintain, debug, and review.
+上の例では、コンテンツスクリプトを文字列として渡しました。しかし、きわめて単純なスクリプトでない限り、スクリプトは別のファイルに保存して管理してください。これにより、コードの管理、デバッグ、レビューが容易になります。 
 
-For example, if we save the script above under the add-on's `data` directory
-in a file called `my-script.js`:
+上のスクリプトを別ファイルとして管理する場合、例えば、アドオンの `data` ディレクトリの下の `my-script.js` というファイルに以下のコードを書き、保存します。
 
     document.body.style.border = "5px solid red";
 
-We can load this script by changing the add-on code like this:
+このスクリプトを読み込むには、アドオンコードを以下のように変更します。
 
     var widgets = require("widget");
     var tabs = require("tabs");
@@ -84,26 +70,18 @@ We can load this script by changing the add-on code like this:
       }
     });
 
-You can load more than one script, and the scripts can interact
-directly with each other. So you can load [jQuery](http://jquery.com/),
-and then your content script can use that.
+スクリプトは複数個読み込むことができます。またスクリプトは相互に直接やりとりすることが可能です。例えば、[jQuery](http://jquery.com/) を読み込んで、コンテンツスクリプトで使用することができます。
 
-## Communicating With the Content Script ##
+## コンテンツスクリプトとのやりとり ##
 
-Your add-on script and the content script can't directly
-access each other's variables or call each other's functions, but they
-can send each other messages.
+アドオンスクリプトとコンテンツスクリプトは、互いの変数に直接アクセスすることも、互いの関数を呼び出すこともできませんが、相互にメッセージを送信することは可能です。
 
-To send a
-message from one side to the other, the sender calls `port.emit()` and
-the receiver listens using `port.on()`.
+アドオンスクリプトとコンテンツスクリプトの間でメッセージを送信するには、送信側が `port.emit()` を呼び出し、受信側が `port.on()` を使用してリッスンします。
 
-* In the content script, `port` is a property of the global `self` object.
-* In the add-on script, `tab-attach()` returns an object containing the
-`port` property you use to send messages to the content script.
+* コンテンツスクリプトで、`port` はグローバルオブジェクト `self` のプロパティです。
+* アドオンスクリプトでは、コンテンツスクリプトへのメッセージ送信に使用する `port` プロパティを格納したオブジェクトが、`tab-attach()` によって返されます。
 
-Let's rewrite the example above to pass a message from the add-on to
-the content script. The content script now needs to look like this:
+上のコード例を書き換えて、アドオンからコンテンツスクリプトにメッセージを渡しましょう。書き換え後のコンテンツスクリプトは、以下のようになります。
 
     // "self" is a global object in content scripts
     // Listen for a "drawBorder"
@@ -111,8 +89,7 @@ the content script. The content script now needs to look like this:
       document.body.style.border = "5px solid " + color;
     });
 
-In the add-on script, we'll send the content script a "drawBorder" message
-using the object returned from `attach()`:
+アドオンスクリプトで、`attach()` から返されたオブジェクトを使用して、コンテンツスクリプトに "drawBorder" メッセージを送信します。
 
     var widgets = require("widget");
     var tabs = require("tabs");
@@ -130,24 +107,16 @@ using the object returned from `attach()`:
       }
     });
 
-The `drawBorder` message isn't a built-in message, it's one that this
-add-on defines in the `port.emit()` call.
+`drawBorder` メッセージは内蔵のメッセージではなく、このアドオンの `port.emit()` 呼び出しで定義されたメッセージです。
 
-## Injecting CSS ##
+## CSS のインジェクション ##
 
-Unlike the [`page-mod`](dev-guide/tutorials/modifying-web-pages-url.html) API,
-`tab.attach()` doesn't enable you to inject CSS directly into a page.
+[`page-mod`](dev-guide/tutorials/modifying-web-pages-url.html) API と異なり、`tab.attach()` ではページに直接 CSS をインジェクションすることはできません。
 
-To modify the style of a page you have to use JavaScript, as in
-the example above.
+ページのスタイルを変更するには、上の例のように JavaScript を使用する必要があります。
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about working with tabs in the SDK, see the
-[Open a Web Page](dev-guide/tutorials/open-a-web-page.html)
-tutorial, the
-[List Open Tabs](dev-guide/tutorials/list-open-tabs.html)
-tutorial, and the [`tabs` API reference](packages/addon-kit/tabs.html).
+SDK でのタブの操作方法の詳細については、[Web ページを開く](dev-guide/tutorials/open-a-web-page.html)と[開いているタブの一覧表示](dev-guide/tutorials/list-open-tabs.html) の各チュートリアル、および[API リファレンス：`tabs`（英語）](packages/addon-kit/tabs.html)を参照してください。
 
-To learn more about content scripts, see the
-[content scripts guide](dev-guide/guides/content-scripts/index.html).
+コンテンツスクリプトの詳細については、[コンテンツスクリプトガイド（英語）](dev-guide/guides/content-scripts/index.html)を参照してください。

@@ -2,26 +2,19 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Creating Annotations #
+# 注釈の作成 #
 
-We'll use two objects to create annotations: a page-mod to find page elements
-that the user can annotate, and a panel for the user to enter the annotation
-text itself.
+ここでは注釈を作成するためのオブジェクトとして、注釈可能なページ内要素を検索する page-mod と、ユーザーが実際に注釈テキスト自体を入力するためのパネルを作成します。
 
-## Selector page-mod ##
+## セレクタ page-mod ##
 
-### Selector Content Scripts ###
+### セレクタコンテンツスクリプト ###
 
-The content script for the selector page-mod uses [jQuery](http://jquery.com/)
-to examine and manipulate the DOM.
+セレクタ page-mod のコンテンツスクリプトは、[jQuery](http://jquery.com/) を使用して DOM の調査と操作を行います。
 
-Its main job is to maintain a "matched element": this is the page element that
-is the current candidate for an annotation. The matched element is highlighted
-and has a click handler bound to it which sends a message to the main add-on
-code.
+このコンテンツスクリプトの主要な役割は「一致要素」、つまり現在の注釈対象候補であるページ内要素を保持することです。以下のコードでは、一致要素をハイライトし、クリックされればメインのアドオンコードにメッセージを送信するハンドラがバインドされます。
 
-The selector page mod can be switched on and off using a message from the
-main add-on code. It is initially off:
+セレクタ page mod は、メインのアドオンコードからのメッセージによってオンとオフを切り替えることができます。初期状態はオフです。
 
     var matchedElement = null;
     var originalBgColor = null;
@@ -41,19 +34,11 @@ main add-on code. It is initially off:
       }
     });
 
-This selector listens for occurrences of the
-[jQuery mouseenter](http://api.jquery.com/mouseenter/) event.
+このセレクタは、[jQuery mouseenter](http://api.jquery.com/mouseenter/) イベントの発生をリッスンします。
 
-When a mouseenter event is triggered the selector checks whether the element
-is eligible for annotation. An element is eligible if it, or one of its
-ancestors in the DOM tree, has an attribute named `"id"`. The idea here is to
-make it more likely that the annotator will be able to identify annotated
-elements correctly later on.
+mouseenter イベントが発生すると、セレクタはその要素が注釈可能かどうかを確認します。その要素自体、または DOM ツリーにあるその要素の先祖のいずれかが、「id」という属性を持っている場合、その要素は注釈可能です。このようなチェックは、ユーザーが注釈を付けた要素をアノテーターが後から正確に識別できるようにするために行われます。
 
-If the page element is eligible for annotation, then the selector highlights
-that element and binds a click handler to it. The click handler sends a message
-called `show` back to the main add-on code. The `show` message contains: the URL
-for the page, the ID attribute value, and the text content of the page element.
+ページ内要素が注釈可能な場合、セレクタはその要素をハイライトし、クリックハンドラがその要素にバインドされます。クリックハンドラは、`show` というメッセージをメインのアドオンコードに送信します。`show` メッセージには、ページの URL、ID 属性値、およびページ内要素のテキストコンテンツが含まれています。
 
     $('*').mouseenter(function() {
       if (!active || $(this).hasClass('annotated')) {
@@ -77,24 +62,19 @@ for the page, the ID attribute value, and the text content of the page element.
       });
     });
 
-Conversely, the add-on resets the matched element on
-[mouseout](http://api.jquery.com/mouseout/):
+逆に、[mouseout](http://api.jquery.com/mouseout/) が発生すると、アドオンによって一致要素がリセットされます。
 
     $('*').mouseout(function() {
       resetMatchedElement();
     });
 
-Save this code in a new file called `selector.js` in your add-on's `data`
-directory.
+アドオンの `data` ディレクトリに `selector.js` という新しいファイルを作成し、このコードを保存します。
 
-Because this code uses jQuery, you'll need to
-[download](http://docs.jquery.com/Downloading_jQuery) that as well, and save it in
-`data`.
+このコードは jQuery を使用するので、jQuery もあわせて[ダウンロード](http://docs.jquery.com/Downloading_jQuery) し、`data` に保存します。
 
-### Updating main.js ###
+### main.js の更新 ###
 
-Go back to `main.js` and add the code to create the selector into the `main`
-function:
+`main.js` に戻り、セレクタを作成するコードを `main` 関数に追加します。
 
     var selector = pageMod.PageMod({
       include: ['*'],
@@ -113,34 +93,22 @@ function:
       }
     });
 
-Make sure the name you use to load jQuery matches the name of the jQuery
-version you downloaded.
+jQuery の読み込みに使用する名前が、ダウンロードした jQuery のバージョンの名前と一致していることを確認してください。
 
-The page-mod matches all pages, so each time the user loads a page the page-mod
-emits the `attach` event, which will call the listener function we've assigned
-to `onAttach`. The handler is passed a
-[worker](packages/api-utils/content/worker.html) object. Each worker
-represents a channel of communication between the add-on code and any content
-scripts running in that particular page context. For a more detailed discussion
-of the way `page-mod` uses workers, see the
-[page-mod documentation](packages/addon-kit/page-mod.html).
+この page-mod はすべてのページに一致するので、ユーザーがページを読み込むたびに page-mod で `attach` イベントが発生し、それによって、`onAttach` に割り当てたリスナー関数が呼び出されます。このハンドラには [worker](packages/api-utils/content/worker.html) オブジェクトが渡されます。各ワーカーは、アドオンコードとその特定のページコンテキストで実行されているコンテンツスクリプトの間の通信チャネルを表します。`page-mod` によるワーカーの使用方法の詳細については、[page-mod のドキュメント（英語）](packages/addon-kit/page-mod.html)を参照してください。.
 
-In the attach handler we do three things:
+アタッチハンドラでは、以下の 3 つの作業を行います。
 
-* send the content script a message with the current activation status
-* add the worker to an array called `selectors` so we can send it messages
-later on
-* assign a message handler for messages from this worker. If the message is
-`show` we will just log the content for the time being. If the message is
-`detach` we remove the worker from the `selectors` array.
+* 現在のアクティブ状態を伝えるメッセージをコンテンツスクリプトに送信します。
+* 後からワーカー宛にメッセージを送信できるように、ワーカーを `selectors` という配列に追加します。
+* このワーカーからのメッセージに対して、メッセージハンドラを割り当てます。メッセージが `show` の場合、当面、コンテンツのログのみを記録します。メッセージが `detach` の場合、`selectors` 配列からワーカーを削除します。
 
-At the top of the file import the `page-mod` module and declare an array for
-the workers:
+ファイルの一番上で、`page-mod` モジュールをインポートし、ワーカーの配列を宣言します。
 
     var pageMod = require('page-mod');
     var selectors = [];
 
-Add `detachWorker`:
+`detachWorker` を追加します。
 
     function detachWorker(worker, workerArray) {
       var index = workerArray.indexOf(worker);
@@ -149,7 +117,7 @@ Add `detachWorker`:
       }
     }
 
-Edit `toggleActivation` to notify the workers of a change in activation state:
+`toggleActivation` を以下のように編集します。これにより、ワーカーにアクティブ状態の変化が通知されます。
 
     function activateSelectors() {
       selectors.forEach(
@@ -164,20 +132,15 @@ Edit `toggleActivation` to notify the workers of a change in activation state:
       return annotatorIsOn;
     }
 
-<span class="aside">We'll be using this URL in all our screenshots. Because
-`cfx run` doesn't preserve browsing history, if you want to play along it's
-worth taking a note of the URL.</span>
-Save the file and execute `cfx run` again. Activate the annotator by clicking
-the widget and load a page: the screenshot below uses
-[http://blog.mozilla.com/addons/2011/02/04/
-overview-amo-review-process/](http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/).
-You should see the highlight appearing when you move the mouse over certain elements:
+<span class="aside">このチュートリアルでは、これ以降のスクリーンショットに一貫して下に示すページを使用します。`cfx run` は閲覧履歴を保存しないので、他のページに移動する場合は、その前にこの URL を記録しておくことをお勧めします。</span>
+
+ファイルを保存し、`cfx run` をもう一度実行します。ウィジェットをクリックしてアノテーターを起動し、ページを読み込みます。下のスクリーンショットでは、[http://blog.mozilla.com/addons/2011/02/04/ overview-amo-review-process/](http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/) が使用されています。
+マウスを移動して特定の要素に合わせると、ハイライトが表示されます。
 
 <img class="image-center"
 src="static-files/media/annotator/highlight.png" alt="Annotator Highlighting">
 
-Click on the highlight and you should see something like this in the console
-output:
+ハイライトをクリックすると、コンソール出力に以下のように表示されます。
 
 <pre>
   info: show
@@ -186,22 +149,17 @@ output:
   review tracks: Full Review and Preliminary Review.
 </pre>
 
-## Annotation Editor Panel ##
+## 注釈エディタパネル ##
 
-So far we have a page-mod that can highlight elements and send information
-about them to the main add-on code. Next we will create the editor panel,
-which enables the user to enter an annotation associated with the selected
-element.
+ここまでの作業で、要素をハイライトし、それらの要素に関する情報をメインのアドオンコードに送信する page-mod を作成しました。次に、エディタパネルを作成します。これは選択された要素についてユーザーが注釈を入力するためのパネルです。
 
-We will supply the panel's content as an HTML file, and will also supply a
-content script to execute in the panel's context.
+このチュートリアルでは、パネルのコンテンツが HTML ファイルで提供されます。またパネルのコンテキストで実行するコンテンツスクリプトも提供されます。
 
-So create a subdirectory under `data` called `editor`. This will contain
-two files: the HTML content, and the content script.
+`data` の下に `editor` という名前のサブディレクトリを作成してください。このサブディレクトリには、以下で作成する HTML コンテンツファイルとコンテンツスクリプトファイルの 2 つを格納します。
 
-### Annotation Editor HTML ###
+### 注釈エディタ HTML ###
 
-The HTML is very simple:
+この HTML は非常に単純です。
 
 <script type="syntaxhighlighter" class="brush: html"><![CDATA[
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -237,17 +195,16 @@ The HTML is very simple:
 ]]>
 </script>
 
-Save this inside `data/editor` as `annotation-editor.html`.
+これを `data/editor` の中に `annotation-editor.html` という名前で保存します。
 
-### Annotation Editor Content Script ###
+### 注釈エディタのコンテンツスクリプト ###
 
-In the corresponding content script we do two things:
+対応するコンテンツスクリプトでは、次の 2 つの処理を行います。
 
-* handle a message from the add-on code by giving the text area focus
-* listen for the return key and when it is pressed, send the contents of the
-text area to the add-on.
+* アドオンコードからのメッセージに対する処理として、テキスト領域をフォーカスします。
+* リターンキーをリッスンし、リターンキーが押されたときにテキスト領域のコンテンツをアドオンに送信します。
 
-Here's the code:
+コードは以下のとおりです。
 
     var textArea = document.getElementById('annotation-box');
 
@@ -265,17 +222,17 @@ Here's the code:
     });
 
 
-Save this inside `data/editor` as `annotation-editor.js`.
+これを `data/editor` の中に `annotation-editor.js` という名前で保存します。
 
-### Updating main.js Again ###
+### main.js の更新 ###
 
-Now we'll update `main.js` again to create the editor and use it.
+ここで再度 `main.js` を更新してエディタを作成し、それを使用します。
 
-First, import the `panel` module:
+まず、`panel` モジュールをインポートします。
 
     var panels = require('panel');
 
-Then add the following code to the `main` function:
+次に、`main` 関数に以下のコードを追加します。
 
     var annotationEditor = panels.Panel({
       width: 220,
@@ -294,15 +251,9 @@ Then add the following code to the `main` function:
       }
     });
 
-We create the editor panel but don't show it.
-We will send the editor panel the `focus` message when it is shown, so it will
-give the text area focus. When the editor panel sends us its message we log the
-message and hide the panel.
+ここではエディタパネルを作成しますが、表示はしないでください。エディタパネルが表示されると、`focus` メッセージがエディタパネルに送信され、テキスト領域がフォーカスされます。エディタパネルからメッセージが送られると、メッセージがログに記録されてパネルが非表示になります。
 
-The only thing left is to link the editor to the selector. So edit the message
-handler assigned to the selector so that on receiving the `show` message we
-assign the content of the message to the panel using a new property
-"annotationAnchor", and show the panel:
+最後に残った作業として、エディタをセレクタにリンクします。これには、セレクタに割り当てられたメッセージハンドラを以下のように編集します。これにより、`show` メッセージを受信したときに、新しいプロパティ「annotationAnchor」を使用してメッセージのコンテンツがパネルに割り当てられ、パネルが表示されます。
 
     var selector = pageMod.PageMod({
       include: ['*'],
@@ -322,16 +273,13 @@ assign the content of the message to the panel using a new property
       }
     });
 
-Execute `cfx run` again, activate the annotator, move your mouse over an
-element and click the element when it is highlighted. You should see a panel
-with a text area for a note:
+`cfx run` をもう一度実行し、アノテーターを起動します。要素にマウスを合わせ、ハイライトされたらその要素をクリックします。以下のように注釈入力用のテキスト領域を持つパネルが表示されます。
 
 <img class="image-center"
 src="static-files/media/annotator/editor-panel.png" alt="Annotator Editor Panel">
 <br>
 
-Enter the note and press the return key: you should see console output like
-this:
+注釈を入力してリターンキーを押します。以下のようなコンソール出力が表示されます。
 
 <pre>
   info: http://blog.mozilla.com/addons/2011/02/04/overview-amo-review-process/,
@@ -340,5 +288,4 @@ this:
   info: We should ask for Full Review if possible.
 </pre>
 
-That's a complete annotation, and in the next section we'll deal with
-[storing it](dev-guide/tutorials/annotator/storing.html).
+これが完全な注釈です。次のセクションでは、[注釈の保存](dev-guide/tutorials/annotator/storing.html)を行います。

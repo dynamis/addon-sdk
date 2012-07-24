@@ -2,34 +2,25 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Listening for Load and Unload #
+# アドオンのロードとアンロードのリッスン #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
 ## exports.main() ##
 
-Your add-on's `main.js` code is executed as soon as it is loaded. It is loaded
-when it is installed, when it is enabled, or when Firefox starts.
+アドオンの `main.js` コードは、アドオンが読み込まれるとすぐに実行されます。`main.js` コードは、インストールされたとき、有効化されたとき、または Firefox が起動したときに読み込まれます。
 
-If your add-on exports a function called `main()`, that function will be
-called immediately after the overall `main.js` is evaluated, and after all
-top-level `require()` statements have run (so generally after all dependent
-modules have been loaded).
+アドオンが `main()` という関数をエクスポートする場合、`main.js` 全体が評価され、すべての最上位レベルの `require()` 文が実行されると（したがって、通常、すべての従属モジュールが読み込まれると）すぐにその関数が呼び出されます。
 
     exports.main = function (options, callbacks) {};
 
-`options` is an object describing the parameters with which your add-on was
-loaded.
+`options` は、アドオンのロードに使用したパラメータを示すオブジェクトです。
 
 ### options.loadReason ###
 
-`options.loadReason` is one of the following strings
-describing the reason your add-on was loaded: 
+`options.loadReason` は、アドオンが読み込まれた理由を示す以下のいずれかの文字列です。 
 
 <pre>
 install
@@ -41,53 +32,39 @@ downgrade
 
 ### options.staticArgs ###
 
-You can use the [`cfx`](dev-guide/cfx-tool.html)
-`--static-args` option to pass arbitrary data to your
-program.
+[`cfx`](dev-guide/cfx-tool.html) `--static-args` オプションを使用すると、任意のデータをプログラムに渡すことができます。
 
-The value of `--static-args` must be a JSON string. The object encoded by the
-JSON becomes the `staticArgs` member of the `options` object passed as the
-first argument to your program's `main` function. The default value of
-`--static-args` is `"{}"` (an empty object), so you don't have to worry about
-checking whether `staticArgs` exists in `options`.
+`--static-args` の値には、JSON 文字列を指定します。JSON によってエンコードされたオブジェクトは、`options` オブジェクトの `staticArgs` メンバーとなり、最初の引数としてプログラムの `main` 関数に渡されます。`--static-args` のデフォルトの値は `「{}」`（空のオブジェクト）なので、`options` に `staticArgs` が存在するかどうかを確認する必要はありません。
 
-For example, if your `main.js` looks like this:
+例えば、`main.js` が以下のような場合、
 
     exports.main = function (options, callbacks) {
       console.log(options.staticArgs.foo);
     };
 
-And you run cfx like this:
+以下のように cfx を実行すると、
 
 <pre>
-  cfx run --static-args="{ \"foo\": \"Hello from the command line\" }"
+  cfx run --static-args="{ ¥"foo¥": ¥"Hello from the command line¥" }"
 </pre>
 
-Then your console should contain this:
+コンソールに、以下のように表示されます。
 
 <pre>
 info: Hello from the command line
 </pre>
 
-The `--static-args` option is recognized by `cfx run` and `cfx xpi`.
-When used with `cfx xpi`, the JSON is packaged with the XPI's harness options
-and will therefore be used whenever the program in the XPI is run.`
+`--static-args` オプションは、`cfx run` と `cfx xpi` のいずれによっても認識されます。`cfx xpi` で使用した場合、JSON が XPI の harness options を伴ってパッケージ化されるので、XPI 内のプログラムを実行するたびに使用されるようになります。
 
 ## exports.onUnload() ##
 
-If your add-on exports a function called `onUnload()`, that function
-will be called when the add-on is unloaded.
+アドオンが `onUnload()` という関数をエクスポートする場合、その関数はアドオンがアンロードされたときに呼び出されます。
 
     exports.onUnload = function (reason) {};
 
-`reason` is one of the following strings describing the reason your add-on was
-unloaded:
+`reason` は、アドオンがアンロードされた理由を示す以下のいずれかの文字列です。
 
-<span class="aside">But note that due to
-[bug 627432](https://bugzilla.mozilla.org/show_bug.cgi?id=627432),
-your `onUnload` listener will never be called with `uninstall`: it
-will only be called with `disable`. See in particular
-[comment 12 on that bug](https://bugzilla.mozilla.org/show_bug.cgi?id=627432#c12).</span>
+<span class="aside">ただし、[bug 627432](https://bugzilla.mozilla.org/show_bug.cgi?id=627432) のバグのため、`onUnload` リスナーが `uninstall` を理由として呼び出されることはなく、`disable` でのみ呼び出されます。特に[そのバグのコメント 12](https://bugzilla.mozilla.org/show_bug.cgi?id=627432#c12) を参照してください。</span>
 
 <pre>
 uninstall
@@ -97,7 +74,4 @@ upgrade
 downgrade
 </pre>
 
-You don't have to use `exports.main()` or `exports.onUnload()`. You can just place
-your add-on's code at the top level instead of wrapping it in a function
-assigned to `exports.main()`. It will be loaded in the same circumstances, but
-you won't get access to the `options` or `callbacks` arguments.
+`exports.main()` や `exports.onUnload()` の使用は必須ではありません。関数でラップして `exports.main()` に割り当てなくても、アドオンのコードを最上位レベルに置くだけで、同じように読み込まれます。ただしその場合、`options` 引数や `callbacks` 引数にアクセスすることはできません。

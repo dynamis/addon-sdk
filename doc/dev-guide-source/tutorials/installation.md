@@ -2,153 +2,116 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Installation #
+# インストール #
 
-## Prerequisites
+## 前提条件
 
-To develop with the Add-on SDK, you'll need:
+アドオン SDK を使用して開発を行うには、以下が必要です。
 
-* [Python](http://www.python.org/) 2.5 or 2.6. Note that versions 3.0 and 3.1
-  of Python are not supported. Make sure that Python is in your path.
+* [Python](http://www.python.org/) 2.5 または 2.6。Python バージョン 3.0 と 3.1 はサポートされていません。環境変数 PATH に Python のパスを設定してください。
 
-* A [compatible version of Firefox](dev-guide/guides/firefox-compatibility.html).
-That's either: the version of Firefox shipping at the time the SDK shipped,
-or the Beta version of Firefox at the time the SDK shipped. See the
-[SDK Release Schedule](https://wiki.mozilla.org/Jetpack/SDK_2012_Release_Schedule)
-to map SDK releases to Firefox releases.
+* [対応するバージョンの Firefox](dev-guide/guides/firefox-compatibility.html)。
+SDK が公開された時点で公開されているバージョンの Firefox か、または SDK が公開された時点のベータバージョンの Firefox です。SDK リリースと Firefox のリリースの対応については、[SDK のリリース予定（英語）](https://wiki.mozilla.org/Jetpack/SDK_2012_Release_Schedule)を参照してください。
 
-* The SDK itself: you can obtain the latest stable version of the SDK as a
-[tarball](https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz)
-or a [zip file](https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip).
-Alternatively, you can get the latest development version from its
-[GitHub repository](https://github.com/mozilla/addon-sdk).
+* SDK 本体。最新の安定したバージョンの SDK は、[tarball](https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.tar.gz) または [zip ファイル](https://ftp.mozilla.org/pub/mozilla.org/labs/jetpack/jetpack-sdk-latest.zip) として入手できます。あるいは、最新の開発バージョンを [GitHub リポジトリ](https://github.com/mozilla/addon-sdk)から入手することもできます。
 
-## Installation on Mac OS X / Linux ##
+## Mac OS X / Linux でのインストール ##
 
-Extract the file contents wherever you choose, and navigate to the root
-directory of the SDK with a shell/command prompt. For example:
+適切な場所を選択してファイルを展開します。シェル / コマンドプロンプトで SDK のルートディレクトリに移動します。以下に例を示します。
 
 <pre>
 tar -xf addon-sdk.tar.gz
 cd addon-sdk
 </pre>
 
-Then run:
+次に、以下を実行します。
 
 <pre>
 source bin/activate
 </pre>
 
-Your command prompt should now have a new prefix containing the name of the
-SDK's root directory:
+以下のように、コマンドプロンプトの前に SDK のルートディレクトリ名が追加されます。
 
 <pre>
-(addon-sdk)~/mozilla/addon-sdk >
+(addon-sdk)‾/mozilla/addon-sdk >
 </pre>
 
-## Installation on Windows ##
+## Windows でのインストール ##
 
-Extract the file contents wherever you choose, and navigate to the root
-directory of the SDK with a shell/command prompt. For example:
+適切な場所を選択してファイルを展開します。シェル / コマンドプロンプトで SDK のルートディレクトリに移動します。以下に例を示します。
 
 <pre>
 7z.exe x addon-sdk.zip
 cd addon-sdk
 </pre>
 
-Then run:
+次に、以下を実行します。
 
 <pre>
-bin\activate
+bin¥activate
 </pre>
 
-Your command prompt should now have a new prefix containing the full path to
-the SDK's root directory:
+以下のように、コマンドプロンプトの前に SDK の絶対パスが追加されます。
 
 <pre>
-(C:\Users\mozilla\sdk\addon-sdk) C:\Users\Work\sdk\addon-sdk>
+(C:¥Users¥mozilla¥sdk¥addon-sdk) C:¥Users¥Work¥sdk¥addon-sdk>
 </pre>
 
-## SDK Virtual Environment ##
+## SDK 仮想環境 ##
 
-The new prefix to your command prompt indicates that your shell has entered
-a virtual environment that gives you access to the Add-on SDK's command-line
-tools.
+上記のようにコマンドプロンプトが変更されていれば、シェルで仮想環境が起動し、アドオン SDK コマンドラインツールにアクセスできます。
 
-At any time, you can leave a virtual environment by running `deactivate`.
+仮想環境は、`deactivate` を実行していつでも終了することができます。
 
-The virtual environment is specific to this particular command prompt. If you
-close this command prompt, it is deactivated and you need to type
-`source bin/activate` or `bin\activate` in a new command prompt to reactivate
-it. If you open a new command prompt, the SDK will not be active in the new
-prompt.
+仮想環境は、この特定のコマンドプロンプトでのみ有効です。このコマンドプロンプトを閉じると、仮想環境が終了するので、新しいコマンドプロンプトを起動するたびに `source bin/activate` または `bin¥activate` と入力する必要があります。新しいコマンドプロンプトを開くだけでは、SDK は起動されません。
 
-You can have multiple copies of the SDK in different locations on disk and
-switch between them, or even have them both activated in different command
-prompts at the same time.
+ディスク上の異なる場所に SDK の複数のコピーを置き、切り替えて使用することもできます。さらには、別個のコマンドプロンプトで、両方のコピーを同時に起動することも可能です。
 
-### Making `activate` Permanent ###
+### `activate` の永続化 ###
 
-All `activate` does is to set a number of environment variables for the
-current command prompt, using a script located in the top-level `bin`
-directory. By setting these variables permanently in your environment so
-every new command prompt reads them, you can make activation permanent. Then
-you don't need to type `activate` every time you open up a new command prompt.
+`activate` が行う処理は、最上位レベルの `bin` ディレクトリにあるスクリプトを使用して、現在のコマンドプロンプトに関する複数の環境変数を設定することだけです。そこで、使用する環境でこれらの変数を永続的に設定すれば、新しくコマンドプロンプトを開くだけでそれらの変数が読み込まれ、仮想環境が常に使用できます。これにより、新しいコマンドプロンプトを開くたびに `activate` と入力する必要がなくなります。
 
-Because the exact set of variables may change with new releases of the SDK,
-it's best to refer to the activation scripts to determine which variables need
-to be set. Activation uses different scripts and sets different variables for
-bash environments (Linux and Mac OS X) and for Windows environments.
+ただし、コマンドプロンプトに関する変数が、新しい SDK のリリース時に変更されることがあるので、SDK の起動スクリプトを参照して、設定が必要な変数を確認してください。bash 環境（Linux および Mac OS X）と Windows 環境では、起動に使用するスクリプトも、それによって設定される変数も異なります。
 
 #### Windows ####
 
-On Windows, `bin\activate` uses `activate.bat`, and you can make activation
-permanent using the command line `setx` tool or the Control Panel.
+Windows では、`bin¥activate` を実行すると `activate.bat` が使用されます。SDK を常に有効にするには、コマンドラインから `setx` ツールを使用するか、コントロール パネルを使用します。
 
-#### Linux/Mac OS X ####
+#### Linux / Mac OS X ####
 
-On Linux and Mac OS X, `source bin/activate` uses the `activate` bash
-script, and you can make activation permanent using your `~/.bashrc`
-(on Linux) or `~/.bashprofile` (on Mac OS X).
+Linux および Mac OS X では、`source bin/activate` により `activate` bash スクリプトが使用されます。SDK を常に有効にするには、`‾/.bashrc`（Linux）または `‾/.bashprofile`（Mac OS X）を使用します。
 
-As an alternative to this, you can create a symbolic link to the `cfx`
-program in your `~/bin` directory:
+あるいは、`‾/bin` ディレクトリにある `cfx` プログラムへのシンボリックリンクを作成する方法もあります。
 
 <pre>
-ln -s PATH_TO_SDK/bin/cfx ~/bin/cfx
+ln -s PATH_TO_SDK/bin/cfx ‾/bin/cfx
 </pre>
 
-## Sanity Check ##
+## サニティチェック ##
 
-Run this at your shell prompt:
+シェルプロンプトで以下を実行します。
 
 <pre>
 cfx
 </pre>
 
-It should produce output whose first line looks something like this, followed by
-many lines of usage information:
+これにより、使用状況の情報が大量に出力されますが、以下では最初の数行のみを示します。
 
 <pre>
 Usage: cfx [options] [command]
 </pre>
 
-This is the `cfx` command-line program.  It's your primary interface to the
-Add-on SDK.  You use it to launch Firefox and test your add-on, package your
-add-on for distribution, view documentation, and run unit tests.
+これが `cfx` コマンドラインプログラムです。`cfx` は、アドオン SDK の主要なインターフェイスで、Firefox の起動とアドオンのテスト、アドオンを配布するためのパッケージング、文書の表示、単体テストの実行に使用します。
 
 ## cfx docs ##
 
-If you're reading these documents online, try running `cfx docs`. This will
-build the documentation for the SDK and display it in a browser.
+cfx docs` を実行すると、SDK のドキュメントがビルドされ、ブラウザに表示されます。
 
-## Problems? ##
+## 問題が発生した場合 ##
 
-Try the [Troubleshooting](dev-guide/tutorials/troubleshooting.html)
-page.
+[トラブルシューティング](dev-guide/tutorials/troubleshooting.html)のページを参照して、解決を試みてください。
+ 
 
-## Next Steps ##
+## 次のステップ ##
 
-Next, take a look at the
-[Getting Started With cfx](dev-guide/tutorials/getting-started-with-cfx.html)
-tutorial, which explains how to create add-ons using the `cfx` tool.
+[cfx 入門](dev-guide/tutorials/getting-started-with-cfx.html)のチュートリアルで、`cfx` ツールによってアドオンを作成する方法を学習してください。

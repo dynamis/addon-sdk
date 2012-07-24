@@ -2,29 +2,21 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Displaying Annotations #
+# 注釈の表示 #
 
-In this chapter we'll use a page-mod to locate elements of web pages that have
-annotations associated with them, and a panel to display the annotations.
+このセクションでは、page-mod を使用して、Web ページの中で注釈が付けられた要素を検索するとともに、検出した注釈をパネルに表示します。
 
-## Matcher page-mod ##
+## マッチャー page-mod ##
 
-### Matcher Content Script ###
+### マッチャーコンテンツスクリプト ###
 
-The content script for the matcher page-mod is initialized with a list
-of all the annotations that the user has created.
+マッチャー page-mod のコンテンツスクリプトは、ユーザーがそれまでに作成したすべての注釈のリストを使用して初期化します。
 
-When a page is loaded the matcher searches the DOM for elements that match
-annotations. If it finds any it binds functions to that element's
-[mouseenter](http://api.jquery.com/mouseenter/) and
-[mouseleave](http://api.jquery.com/mouseleave/) events to send messages to the
-`main` module, asking it to show or hide the annotation.
+ページが読み込まれると、マッチャーは DOM から注釈に一致する要素を検索します。要素が検出された場合、マッチャーはその要素の [mouseenter](http://api.jquery.com/mouseenter/) および [mouseleave](http://api.jquery.com/mouseleave/) イベントに関数をバインドすることでメッセージを `main` モジュールに送信し、その注釈の表示または非表示を指示します。
 
-Like the selector, the matcher also listens for the window's `unload` event
-and on unload sends a `detach` message to the `main` module, so the add-on
-can clean it up.
+マッチャーはセレクタと同様、ウィンドウの `unload` イベントをリッスンし、アンロード時に `detach` メッセージを `main` モジュールに送信します。これにより、アドオンはクリーンアップが可能になります。
 
-The complete content script is here:
+完全なコンテンツスクリプトを以下に示します。
 
     self.on('message', function onMessage(annotations) {
       annotations.forEach(
@@ -55,16 +47,15 @@ The complete content script is here:
       $(annotationAnchor).attr('annotation', annotation.annotationText);
     }
 
-Save this in `data` as `matcher.js`.
+これを  `data` の中に `matcher.js` という名前で保存します。
 
-### Updating main.js ###
+### main.js の更新 ###
 
-First, initialize an array to hold workers associated with the matcher's
-content scripts:
+まず、マッチャーコンテンツスクリプトに関連付けられるワーカーを保持する配列を初期化します。
 
     var matchers = [];
 
-In the `main` function, add the code to create the matcher:
+`main` 関数で、マッチャーを作成する以下のコードを追加します。
 
     var matcher = pageMod.PageMod({
       include: ['*'],
@@ -90,18 +81,13 @@ In the `main` function, add the code to create the matcher:
       }
     });
 
-When a new page is loaded the function assigned to `onAttach` is called. This
-function:
+新しいページを読み込むと、`onAttach` に割り当てられている関数が呼び出されます。この関数は以下の処理を行います。
 
-* initializes the content script instance with the current set of
-annotations
-* provides a handler for messages from that content script, handling the three
-messages - `show`, `hide` and `detach` - that the content script might send
-* adds the worker to an array, so we it can send messages back later.
+* 現在の注釈セットを使用して、コンテンツスクリプトのインスタンスを初期化します。
+* そのコンテンツスクリプトからメッセージを受信するためのハンドラをバインドし、送信されてくる `show`、`hide`、`detach` の 3 種類のメッセージを処理します。 
+* 後からメッセージを返せるように、ワーカーを配列に追加します。
 
-Then in the module's scope implement a function to update the matcher's
-workers, and edit `handleNewAnnotation` to call this new function when the
-user enters a new annotation:
+次にこのモジュールのスコープ内で、マッチャーワーカーを更新する関数を実装し、ユーザーが新しい注釈を入力したときにこの新しい関数が呼び出されるように `handleNewAnnotation` を編集します。
 
     function updateMatchers() {
       matchers.forEach(function (matcher) {
@@ -118,19 +104,18 @@ user enters a new annotation:
     }
 <br>
 
-## Annotation panel ##
+## 注釈パネル ##
 
-The annotation panel just shows the content of an annotation.
+注釈パネルは、注釈のコンテンツのみを表示します。
 
-There are two files associated with the annotation panel:
+注釈パネルには、次の 2 つのファイルが関連付けられています。
 
-* a simple HTML file to use as a template
-* a simple content script to build the panel's content
+* テンプレートとして使用される単純な HTML ファイル
+* パネルのコンテンツを構築する単純なコンテンツスクリプト
 
-These files will live in a new subdirectory of `data` which we'll call
-`annotation`.
+これらのファイルはすべて、`data` の新しいサブディレクトリ（ここでは `annotation` と名付けます）に保存します。
 
-### Annotation panel HTML ###
+### 注釈パネル HTML ###
 
 <script type="syntaxhighlighter" class="brush: html"><![CDATA[
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -164,21 +149,21 @@ These files will live in a new subdirectory of `data` which we'll call
 ]]>
 </script>
 
-Save this in `data/annotation` as `annotation.html`.
+これを `data/annotation` の中に `annotation.html` という名前で保存します。
 
-### Annotation panel Content Script ###
+### 注釈パネルのコンテンツスクリプト ###
 
-The annotation panel has a minimal content script that sets the text:
+注釈パネルには、テキストを設定する最小限のコンテンツスクリプトが存在します。
 
      self.on('message', function(message) {
       $('#annotation').text(message);
     });
 
-Save this in `data/annotation` as `annotation.js`.
+これを `data/annotation` の中に `annotation.js` という名前で保存します。
 
-### Updating main.js ###
+### main.js の更新 ###
 
-Finally, update `main.js` with the code to construct the annotation panel:
+最後に、注釈パネルを作成するコードを使用して `main.js` を更新します。
 
     var annotation = panels.Panel({
       width: 200,
@@ -191,23 +176,18 @@ Finally, update `main.js` with the code to construct the annotation panel:
       }
     });
 
-Execute `cfx run` one last time. Activate the annotator and enter an
-annotation. You should see a yellow border around the item you annotated:
+最後に `cfx run` を 1 回実行します。アノテーターを起動し、注釈を入力します。注釈を付けたアイテムの周りに、以下のように黄色の枠が表示されます。
 
 <img class="image-center"
 src="static-files/media/annotator/matcher.png" alt="Annotator Matcher">
 <br>
 
-When you move your mouse over the item, the annotation should appear:
+そのアイテムにマウスを合わせると、注釈が表示されます。
 
 <img class="image-center"
 src="static-files/media/annotator/annotation-panel.png" alt="Annotation Panel">
 <br>
 
-Obviously this add-on isn't complete yet. It could do with more beautiful
-styling, it certainly needs a way to delete annotations, it should deal with
-`OverQuota` more reliably, and the matcher could be made to match more
-reliably.
+もちろんこのアドオンは、まだ完成から程遠い状態です。書式は改善の余地があり、注釈を削除する仕組みも必要です。信頼性の高い `OverQuota` 処理が必要であり、マッチャーによる一致処理の信頼性をさらに高める方法はいくつも考えられます。
 
-But we hope this gives you an idea of the things that are possible with the
-modules in the `addon-kit` package.
+しかし、この `addon-kit` パッケージの各モジュールが持つ可能性を把握する上で、このチュートリアルが一助となれば幸いです。

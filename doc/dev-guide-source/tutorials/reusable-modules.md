@@ -2,47 +2,25 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Creating Reusable Modules #
+# 再利用可能なモジュールの作成 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-With the SDK you don't have to keep all your add-on in a single "main.js"
-file. You can split your code into separate modules with clearly defined
-interfaces between them. You then import and use these modules from other
-parts of your add-on using the `require()` statement, in exactly that same
-way that you import core SDK modules like
-[`widget`](packages/addon-kit/widget.html) or
-[`panel`](packages/addon-kit/panel.html).
+この SDK では、アドオンの全てのコードを「main.js」ファイルに書く必要はありません。1 つのコードを別個のモジュールに分割し、それぞれに明確なインターフェイスを定義することができます。その上で、アドオンの他の部分から `require()` 文によってこれらのモジュールをインポートして使用します。つまり、[`widget`](packages/addon-kit/widget.html) や [`panel`](packages/addon-kit/panel.html) などの SDK のコアモジュールをインポートする場合と同じ方法が使用できます。
 
-It can often make sense to structure a larger or more complex add-on as a
-collection of modules. This makes the design of the add-on easier to
-understand and provides some encapsulation as each module will export only
-what it chooses to, so you can change the internals of the module without
-breaking its users.
+多くの場合、大きなアドオンや複雑なアドオンは、モジュールの集まりとして構成する方が便利です。アドオンの設計がわかりやすくなる上、各モジュールでは選択した要素のみをエクスポートするという一種のカプセル化が可能になるので、ユーザーが使用できる状態を保ったままモジュールの内部を変更できます。
 
-Once you've done this, you can package the modules and distribute them
-independently of your add-on, making them available to other add-on developers
-and effectively extending the SDK itself.
+このように開発されたアドオンは、モジュールをパッケージ化し、アドオンから独立して配布できます。これにより、他のアドオン開発者がそのモジュールを利用できるとともに、SDK 自体が事実上拡張されることになります。
 
-In this tutorial we'll do exactly that with a module that exposes the
-geolocation API in Firefox.
+このチュートリアルでは、Firefox の位置情報 API を使用したモジュールにより、以上のことを正確に実現します。
 
-## Using Geolocation in an Add-on ##
+## アドオンでの位置情報の使用 ##
 
-Suppose we want to use the
-[geolocation API built into Firefox](https://developer.mozilla.org/en/using_geolocation).
-The SDK doesn't provide an API to access geolocation, but we can
-[access the underlying XPCOM API using `require("chrome")`](dev-guide/guides/xul-migration.html#xpcom).
+[Firefox に内蔵の位置情報 API](https://developer.mozilla.org/en/using_geolocation) を使用する場合を考えてみましょう。SDK は位置情報にアクセスするための API を提供していませんが、[`require("chrome")` を使用して XPCOM API にアクセス](dev-guide/guides/xul-migration.html#xpcom)できます。
 
-The following add-on adds a [button to the toolbar](dev-guide/tutorials/adding-toolbar-button.html):
-when the user clicks the button, it loads the
-[XPCOM nsIDOMGeoGeolocation](https://developer.mozilla.org/en/XPCOM_Interface_Reference/NsIDOMGeoGeolocation)
-object, and retrieves the user's current position:
+次のアドオンでは、[ツールバーにボタンが追加](dev-guide/tutorials/adding-toolbar-button.html) され、ユーザーがそのボタンをクリックすると、[XPCOM nsIDOMGeoGeolocation](https://developer.mozilla.org/en/XPCOM_Interface_Reference/NsIDOMGeoGeolocation) オブジェクトが読み込まれてユーザーの現在の位置が取得されます。
 
     var {Cc, Ci} = require("chrome");
 
@@ -66,33 +44,28 @@ object, and retrieves the user's current position:
       }
     });
 
-Try it out:
+演習：
 
-* create a new directory called "whereami" and navigate to it
-* execute `cfx init`
-* open "lib/main.js" and add the code above
-* execute `cfx run`, then `cfx run` again
+* 「whereami」という名前の新しいディレクトリを作成し、そのディレクトリに移動します。
+* `cfx init` を実行します。
+* 「lib/main.js」を開き、内容を上のコードと置き換えます。
+* `cfx run` を実行した後、`cfx run` を再度実行します。
 
-You should see a button added to the "Add-on Bar" at the bottom of
-the browser window:
+ボタンが、ブラウザウィンドウの一番下の「アドオンバー」に追加されます。
 
 <img class="image-center" src="static-files/media/screenshots/widget-mozilla.png"
 alt="Mozilla icon widget" />
 
-Click the button, and after a short delay you should see output like
-this in the console:
+ボタンをクリックすると、少ししてコンソールに以下のような出力が表示されます。
 
 <pre>
 info: latitude:  29.45799999
 info: longitude:  93.0785269
 </pre>
 
-So far, so good. But the geolocation guide on MDN tells us that we must
-[ask the user for permission](https://developer.mozilla.org/en/using_geolocation#Prompting_for_permission)
-before using the API.
+ここまでは順調です。しかし、MDN の位置情報ガイドによると、API を使用する前に [ユーザーに許可を求める](https://developer.mozilla.org/en/using_geolocation#Prompting_for_permission)必要があります。
 
-So we'll extend the add-on to include an adapted version of the code in
-that MDN page:
+そこで、MDN のページにある対応バージョンのコードを使用してアドオンを拡張します。
 
 <pre><code>
 var activeBrowserWindow = require("window-utils").activeBrowserWindow;
@@ -192,30 +165,23 @@ var widget = require("widget").Widget({
 
 </code></pre>
 
-This works fine: when we click the button, we get a notification box
-asking for permission, and depending on our choice the add-on logs either
-the position or an error message.
+これでボタンをクリックすると、許可を求める通知ボックスが表示され、ユーザーの選択に応じて位置情報かエラーメッセージのいずれかがログとして出力されるようになりました。
 
-But the code is now somewhat long and complex, and if we want to do much
-more in the add-on, it will be hard to maintain. So let's split the
-geolocation code into a separate module.
+しかし拡張したことでコードが大きく複雑になってしまいました。このアドオンに他の機能を追加しようとすると管理が困難になります。そこで、位置情報コードを別のモジュールに分割することにします。
 
-## Creating a Separate Module ##
+## 別のモジュールの作成 ##
 
-### Create `geolocation.js` ###
+### `geolocation.js` の作成 ###
 
-First create a new file in "lib" called "geolocation.js", and copy
-everything except the widget code into this new file.
+まず、「lib」に「geolocation.js」という名前の新しいファイルを作成し、ウィジェットのコード以外のすべてのコードを新しいファイルにコピーします。
 
-Next, add the following line somewhere in the new file:
+次に、新しいファイルのどこかに、以下の行を追加します。
 
     exports.getCurrentPosition = getCurrentPositionWithCheck;
 
-This defines the public interface of the new module. We export a single
-a function to prompt the user for permission and get the current position
-if they agree.
+これにより、新しいモジュールのパブリックインターフェイスが定義されます。ここでは、ユーザーに許可を求め、ユーザーが同意した場合には現在の位置を取得する関数のみをエクスポートします。
 
-So "geolocation.js" should look like this:
+これにより、「geolocation.js」は以下のようになります。
 
 <pre><code>
 var activeBrowserWindow = require("window-utils").activeBrowserWindow;
@@ -299,23 +265,20 @@ function getCurrentPosition(callback) {
 exports.getCurrentPosition = getCurrentPositionWithCheck;
 </code></pre>
 
-### Update `main.js` ###
+### `main.js` の更新 ###
 
-Finally, update "main.js". First add a line to import the new module:
+最後に、"main.js" を更新します。まず、新しいモジュールをインポートするための行を追加します。
 
     var geolocation = require("./geolocation");
 
-When importing modules that are not SDK built in modules, it's a good
-idea to specify the path to the module explicitly like this, rather than
-relying on the module loader to find the module you intended.
+SDK の内蔵モジュール以外のモジュールをインポートする場合、可能であればモジュールローダーによって対象のモジュールを検索するのではなく、上のように明示的にモジュールのパスを指定してください。
 
-Edit the widget's call to `getCurrentPositionWithCheck()` so it calls
-the geolocation module's `getCurrentPosition()` function instead:
+ウィジェットの `getCurrentPositionWithCheck()` への呼び出しを変更して、代わりに `getCurrentPosition()` 関数が呼び出されるように指定します。
 
     geolocation.getCurrentPosition(function(position) {
       if (!position) {
 
-Now "main.js" should look like this:
+これにより、「geolocation.js」は以下のようになります。
 
 <pre><code>
 var geolocation = require("./geolocation");
@@ -338,76 +301,51 @@ var widget = require("widget").Widget({
 });
 </code></pre>
 
-## Packaging the Geolocation Module ##
+## 位置情報モジュールのパッケージ化 ##
 
-So far, this is a useful technique for structuring your add-on.
-But you can also package and distribute modules independently of
-your add-on: then any other add-on developer can download your
-module and use it in exactly the same way they use the SDK's built-in
-modules.
+これまで見てきたように、モジュール化はアドオンを構成する上で便利なテクニックです。モジュールはさらにパッケージ化して、アドオンと別個に配布することもできます。これにより、他のアドオン開発者がそのモジュールをダウンロードして、SDK の内蔵モジュールとまったく同じように使用できるようになります。
 
-### Code Changes ###
+### コードの変更 ###
 
-First we'll make a couple of changes to the code.
-At the moment the message displayed in the prompt and the name of
-the preference used to store the user's choice are hardcoded:
+まず、コードを少し変更します。現在、プロンプトに表示されるメッセージおよびユーザーの選択内容の格納に使用されるプリファレンス名は、以下のようにハードコードされています。
 
     let pref = "extensions.whereami.allowGeolocation";
     let message = "whereami Add-on wants to know your location."
 
-Instead we'll use the `self` module to ensure that they are specific
-to the add-on:
+これを以下のように変更し、`self` モジュールを使用して、それらのプリファレンス名がアドオンに固有になるようにします。
 
     var addonName = require("self").name;
     var addonId = require("self").id;
     let pref = "extensions." + addonId + ".allowGeolocation";
     let message = addonName + " Add-on wants to know your location."
 
-### Repackaging ###
+### 再パッケージ化 ###
 
-Next we'll repackage the geolocation module.
+次に、位置情報モジュールを再パッケージ化します。
 
-* create a new directory called "geolocation", and run `cfx init` in it.
-* delete the "main.js" that `cfx` generated, and copy "geolocation.js"
-there instead.
+* 「geolocation」という名前の新しいディレクトリを作成し、そのディレクトリで `cfx init` を実行します。
+* `cfx` によって生成された「main.js」を削除し、ここで作成した「geolocation.js」をコピーします。
 
-### Documentation ###
+### ドキュメントの作成 ###
 
-If you document the package and the modules it contains, then people
-who install your package and execute `cfx docs` will see the documentation
-integrated with the SDK's own documentation.
+パッケージとそれに含まれるモジュールに関するドキュメントを作成しておけば、他の開発者がそのパッケージをインストールし、`cfx docs` を実行したときに SDK 自体のドキュメントと統合されて表示されます。
 
-You can document the package that contains the geolocation module by editing
-the "README.md" file that `cfx init` created in the package root. It's in
-[Markdown](http://daringfireball.net/projects/markdown/syntax) syntax.
+位置情報モジュールを含むパッケージに関するドキュメントは、パッケージルートで `cfx init` によって生成された「README.md」ファイルを編集して作成することができます。このドキュメントは、[Markdown](http://daringfireball.net/projects/markdown/syntax) 形式です。
 
-You can document the geolocation module itself by creating a file called
-"geolocation.md" in your package's "doc" directory. This file is also
-written in Markdown, although you can optionally use some
-[extended syntax](https://wiki.mozilla.org/Jetpack/SDK/Writing_Documentation#APIDoc_Syntax)
-to document APIs.
+位置情報モジュール自体のドキュメントを用意するには、パッケージの「doc」ディレクトリに「geolocation.md」というファイルを作成します。このファイルも Markdown 形式で記述されますが、必要に応じて、API の記述に[拡張構文](https://wiki.mozilla.org/Jetpack/SDK/Writing_Documentation#APIDoc_Syntax)を使用することができます。
 
-Try it:
+演習：
 
-* edit "README.md", and add a "geolocation.md" under "doc"
-* copy your geolocation package under the "packages" directory in the SDK root
-* execute `cfx docs`
+* 「README.md」を編集し、「doc」の下に「geolocation.md」を追加します。
+* SDK ルートの「packages」ディレクトリの下に、作成した位置情報パッケージをコピーします。
+* `cfx docs` を実行します。
 
-Once `cfx docs` has finished, you should see a new entry appear in the
-sidebar called "Third-Party APIs", which lists the geolocation package
-and the module it contains.
+`cfx docs` の実行が完了すると、「Third-Party APIs」というサイドバーに、位置情報パッケージとそれに含まれるモジュールが一覧表示されます。
 
-### Editing "package.json" ###
+### 「package.json」の編集 ###
 
-The "package.json" file in your package's root directory contains metadata
-for your package. See the
-[package specification](dev-guide/package-spec.html) for
-full details. If you intend to distribute the package, this is a good place
-to add your name as the author, choose a distribution license, and so on.
+パッケージのルートディレクトリの「package.json」ファイルには、パッケージ用のメタデータが格納されています。詳細については、[パッケージ仕様（英語）](dev-guide/package-spec.html) を参照してください。パッケージを配布する場合は、ここで作成者の名前を追加したり、配布ライセンスを選択したりするとよいでしょう。
 
-## Learning More ##
+## さらに詳しく ##
 
-To see some of the modules people have already developed, see the page of
-[community-developed modules](https://github.com/mozilla/addon-sdk/wiki/Community-developed-modules).
-To learn how to use third-party modules in your own code, see the
-[tutorial on adding menu items](dev-guide/tutorials/adding-menus.html).
+他の開発者が作成したモジュールの例については、[コミュニティ開発モジュール（英語）](https://github.com/mozilla/addon-sdk/wiki/Community-developed-modules) のページを参照してください。開発中のコードでサードパーティ製のモジュールを使用する方法の詳細については、[メニューアイテムの追加についてのチュートリアル](dev-guide/tutorials/adding-menus.html)を参照してください。

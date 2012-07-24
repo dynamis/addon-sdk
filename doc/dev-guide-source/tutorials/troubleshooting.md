@@ -2,106 +2,82 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Troubleshooting #
+# トラブルシューティング #
 
-If you're having trouble getting the Add-on SDK up and running, don't panic!
-This page lists some starting points that might help you track down your
-problem.
+インストール後、アドオン SDK が機能しなくても心配は要りません。
+このページでは、問題の原因を究明するためにまず行う手順をいくつか示します。
 
-Quarantine Problem on Mac OS X
+Mac OS X での隔離の問題
 ------------------------------
-On Mac OS X, you might see the following error when you try to run `cfx`:
+Mac OS X で `cfx` を実行しようとすると、次のエラーが発生することがあります。
 
 <pre>
 /path/to/sdk/bin/cfx: /usr/bin/env: bad interpreter: Operation not permitted
 </pre>
 
-This might be because the `cfx` executable file has been placed in quarantine
-during download from the Internet.
+このエラーの原因として、インターネットからダウンロードした `cfx` 実行可能ファイルが、隔離領域に配置されている可能性があります。
 
-To get it out of quarantine, use the `xattr -d` command, specifying
-`com.apple.quarantine` as the name of the attribute to delete, and `cfx` as
-the file from which to delete that attribute:
+隔離領域からファイルを取り出すには、以下のように `xattr -d` コマンドを使用し、削除する属性名に `com.apple.quarantine`、その属性を削除するファイルの名前に `cfx` を指定します。
 
 <pre>
 xattr -d com.apple.quarantine /path/to/sdk/bin/cfx
 </pre>
 
-Check Your Python
+Python の確認
 -----------------
 
-The SDK's `cfx` tool runs on Python.  If you're having trouble getting `cfx` to
-run at all, make sure you have Python correctly installed.
+SDK の `cfx` ツールは、Python 上で動作します。`cfx` が起動しない場合は、Python が正しくインストールされていることを確認してください。
 
-Try running the following from a command line:
+これには、コマンドラインから以下を実行します。
 
 <pre>
   python --version
 </pre>
 
-`cfx` currently expects Python 2.5 or 2.6.  Older and newer versions may or may
-not work.
+`cfx` を使用するには、Python 2.5 または 2.6 が必要です。それより古いバージョンも新しいバージョンも機能しない可能性があります。
 
 
-Check Your Firefox or XULRunner
+Firefox または XULRunner の確認
 -------------------------------
 
-`cfx` searches well known locations on your system for Firefox or XULRunner.
-`cfx` may not have found an installation, or if you have multiple installations,
-`cfx` may have found the wrong one.  In those cases you need to use `cfx`'s
-`--binary` option.  See the [cfx Tool][] guide for more information.
+`cfx` は、システム上の既知の場所で Firefox または XULRunner を検索します。しかし、`cfx` が Firefox または XULRunner を検出できないことがあります。また、複数個インストールされている場合に、誤ったインストール環境を検出することも考えられます。そのような場合には、`cfx` の `--binary` オプションを使用します。詳細については、[cfx ツール][]ガイド（英語）を参照してください。
 
-When you run `cfx` to test your add-on or run unit tests, it prints out the
-location of the Firefox or XULRunner binary that it found, so you can check its
-output to be sure.
+`cfx` を実行してアドオンのテストまたは単体テストを行うと、検出された Firefox または XULRunner のバイナリの場所が出力されるので、正しいバイナリが使用されているかどうかを確認できます。
 
 [cfx Tool]: dev-guide/cfx-tool.html
 
 
-Check Your Text Console
+テキストコンソールの確認
 -----------------------
 
-When errors are generated in the SDK's APIs and your code, they are logged to
-the text console.  This should be the same console or shell from which you ran
-the `cfx` command.
+SDK の API とコード内でエラーが発生すると、それらのエラーはテキストコンソールにロギングされます。このコンソールは、`cfx` コマンドを実行したのと同じコンソールまたはシェルです。
 
 
-Don't Leave Non-SDK Files Lying Around
+SDK に関係のないファイルの処分
 ------------------------------------------
 
-Currently the SDK does not gracefully handle files and directories that it does
-not expect to encounter.  If there are empty directories or directories or files
-that are not related to the SDK inside your `addon-sdk` directory or its
-sub-directories, try removing them.
+現在のところ、SDK は想定外のファイルやディレクトリを検出した場合、それらを適切に処理することができません。`addon-sdk` ディレクトリまたはそのサブディレクトリの中に、空のディレクトリまたは SDK と無関係のディレクトリやファイルが存在する場合は、それらを移動または削除してください。
 
 
-Search for Known Issues
+既知の問題点の検索
 -----------------------
 
-Someone else might have experienced your problem, too.  Other users often post
-problems to the [project mailing list][jetpack-list].  You can also browse the
-list of [known issues][bugzilla-known] or [search][bugzilla-search] for
-specific keywords.
+問題が発生した場合、他のユーザーがすでに同じ経験をしていることも考えられます。[プロジェクトのメーリングリスト][jetpack-list]には、他のユーザーから問題点の報告が数多く寄せられています。また、[既知の問題（known issues）][bugzilla-known]のリストを参照したり、特定のキーワードを[検索][bugzilla-search]したりすることもできます。
 
 [bugzilla-known]: https://bugzilla.mozilla.org/buglist.cgi?order=Bug%20Number&resolution=---&resolution=DUPLICATE&query_format=advanced&product=Add-on%20SDK
 
 [bugzilla-search]: https://bugzilla.mozilla.org/query.cgi?format=advanced&product=Add-on%20SDK
 
 
-Contact the Project Team and User Group
+プロジェクトチームやユーザーグループへの問い合わせ
 ---------------------------------------
 
-SDK users and project team members discuss problems and proposals on the
-[project mailing list][jetpack-list].  Someone else may have had the same
-problem you do, so try searching the list.
-You're welcome to post a question, too.
+[プロジェクトのメーリングリスト][jetpack-list]では、SDK のユーザーやプロジェクトチームのメンバーが様々な問題点や提案について議論しています。同じ問題に遭遇したユーザーが他にもいる可能性があるので、リストを探してみてください。
+もちろん質問の投稿も大歓迎です。
 
-You can also chat with other SDK users in [#jetpack][#jetpack] on
-[Mozilla's IRC network][IRC].
+[Mozilla の IRC ネットワーク（Mozilla's IRC network）][IRC]の [#jetpack][#jetpack] で、他の SDK ユーザーとチャットすることもできます。
 
-And if you'd like to [report a bug in the SDK][bugzilla-report], that's always
-welcome!  You will need to create an account with Bugzilla, Mozilla's bug
-tracker.
+[SDK のバグ報告][bugzilla-report]も常時受け付けています。その場合、Mozilla のバグ追跡システムである、Bugzilla のアカウントを作成する必要があります。 
 
 [jetpack-list]: http://groups.google.com/group/mozilla-labs-jetpack/topics
 
@@ -112,22 +88,19 @@ tracker.
 [bugzilla-report]: https://bugzilla.mozilla.org/enter_bug.cgi?product=Add-on%20SDK&component=General
 
 
-Run the SDK's Unit Tests
+SDK の単体テストの実行
 ------------------------
 
-The SDK comes with a suite of tests which ensures that its APIs work correctly.
-You can run it with the following command:
+SDK には API が正しく機能するかどうかを確認するテストスイートが付属しています。
+これを実行するには、次のコマンドを使用します。
 
 <pre>
   cfx testall
 </pre>
 
-Some of the tests will open Firefox windows to check APIs related to the user
-interface, so don't be alarmed.  Please let the suite finish before resuming
-your work.
+テスト中に、ユーザーインターフェイスに関連する API を確認するために Firefox ウィンドウが開くことがあるので驚かないでください。作業は、スイートが終了するのを待って再開してください。
 
-When the suite is finished, your text console should contain output that looks
-something like this:
+スイートが終了すると、テキストコンソールに例えば以下のように出力されます。
 
 <pre>
   Testing cfx...
@@ -203,6 +176,4 @@ something like this:
   All tests were successful. Ship it!
 </pre>
 
-If you get lots of errors instead, that may be a sign that the SDK does not work
-properly on your system.  In that case, please file a bug or send a message to
-the project mailing list.  See the previous section for information on doing so.
+上の例と違って多くのエラーが表示される場合、システム上で SDK が正しく機能していないことが考えられます。その場合は、バグを報告するか、プロジェクトのメーリングリストにメッセージを送ってください。手順については、前のセクションを参照してください。 

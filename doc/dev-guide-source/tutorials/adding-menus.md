@@ -2,76 +2,52 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Add a Menu Item to Firefox #
+# Firefox へのメニューアイテムの追加 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-The SDK doesn't yet provide an API to add new menu items to Firefox.
-But it's extensible by design, so anyone can build and publish
-modules for add-on developers to use. Luckily, Erik Vold has written
-a [`menuitems`](https://github.com/erikvold/menuitems-jplib) package
-that enables us to add menu items.
+この SDK では、Firefox に新しいメニューアイテムを追加する API がまだ提供されていません。しかしこの SDK は拡張性に優れ、誰もがアドオン開発者向けのモジュールを作成して公開できるように設計されています。幸い、メニューアイテムの追加については、Erik Vold 氏の作成による [`menuitems`](https://github.com/erikvold/menuitems-jplib) パッケージが利用できます。
 
-This tutorial does double-duty. It describes the general method for
-using an external, third-party package in your add-on, and it
-describes how to add a menu item using the `menuitems` package in particular.
+このチュートリアルでは、外部のサードパーティパッケージをアドオンで使用する一般的な方法と、特に `menuitems` パッケージを使用してメニューアイテムを追加する方法の両方について説明します。
 
-## Installing `menuitems` ##
+## `menuitems` のインストール##
 
-First we'll download `menuitems` from
-[https://github.com/erikvold/menuitems-jplib](https://github.com/erikvold/menuitems-jplib/zipball/51080383cbb0fe2a05f8992a8aae890f4c014176).
+まず `menuitems` を [https://github.com/erikvold/menuitems-jplib](https://github.com/erikvold/menuitems-jplib/zipball/51080383cbb0fe2a05f8992a8aae890f4c014176) からダウンロードします。
 
-Next, extract it under the SDK's `packages` directory:
+次に、SDK の `packages` ディレクトリ上で `menuitems` を展開します。
 
 <pre>
 cd packages
 tar -xf ../erikvold-menuitems-jplib-d80630c.zip
 </pre>
 
-Now if you run `cfx docs` you'll see a new section appear in the sidebar
-labeled "Third-Party APIs", which contains the `menuitems` package.
-The modules it contains are listed below it: you'll
-see that `menuitems` contains a single module, also
-called `menuitems`.
+ここで `cfx docs` を実行すると、サイドバーに「Third-Party APIs」という新しいセクションが追加され、`menuitems` パッケージが表示されます。パッケージに含まれるモジュールは、その下に表示されます。`menuitems` には、同じく `menuitems` という名前のモジュールが 1 つだけ入っていることがわかります。
 
-Click on the module name and you'll see API documentation for the module. Click
-on the package name and you'll see basic information about the package.
+モジュール名をクリックすると、そのモジュールの ＡＰＩ ドキュメントが表示されます。またパッケージ名をクリックすると、そのパッケージの基本的なドキュメントが表示されます。
 
-One important entry in the package page lists the package's dependencies:
+パッケージページに記載されている重要事項の 1 つに、以下のようなパッケージの依存関係があります。
 
 <pre>
 Dependencies             api-utils, vold-utils
 </pre>
 
-This tells us that we need to install the `vold-utils` package,
-which we can do by downloading it from
-[https://github.com/erikvold/vold-utils-jplib](https://github.com/voldsoftware/vold-utils-jplib/zipball/1b2ad874c2d3b2070a1b0d43301aa3731233e84f)
-and adding it under the `packages` directory alongside `menuitems`.
+この記述は、このパッケージを使用するためには、`vold-utils` パッケージ（[https://github.com/erikvold/vold-utils-jplib](https://github.com/voldsoftware/vold-utils-jplib/zipball/1b2ad874c2d3b2070a1b0d43301aa3731233e84f) からダウンロードできます）をインストールし、`packages` ディレクトリの下に `menuitems` とともに保存する必要があることを示しています。
 
-## Using `menuitems` ##
+## `menuitems` の使用 ##
 
-We can use the `menuitems` module in exactly the same way we use built-in
-modules.
+`menuitems` の使用方法は、内蔵モジュールの使用方法とまったく同じです。
 
-The documentation for the `menuitems` module tells us to we create a menu
-item using `MenuItem()`. Of the options accepted by `MenuItem()`, we'll use
-this minimal set:
+`menuitems` モジュールのドキュメントの記述によると、メニューアイテムの作成には `MenuItem()` を使用します。`MenuItem()` のオプションの中から、ここでは以下の最小セットを使用します。
 
-* `id`: identifier for this menu item
-* `label`: text the item displays
-* `command`: function called when the user selects the item
-* `menuid`: identifier for the item's parent element
-* `insertbefore`: identifier for the item before which we want our item to
-appear
+* `id`：このメニューアイテムの識別子（固有名）
+* `label`：このメニューアイテムに表示されるテキスト
+* `command`：ユーザーがこのメニューアイテムを選択したときに呼び出される関数
+* `menuid`：このメニューアイテムの親要素の識別子
+* `insertbefore`：このメニューアイテムの前に表示されるアイテムの識別子
 
-Next, create a new add-on. Make a directory called 'clickme' wherever you
-like, navigate to it and run `cfx init`. Open `lib/main.js` and add the
-following code:
+次に、新しいアドオンを作成します。任意の場所に 'clickme' という名前のディレクトリを作成し、そのディレクトリに移動して `cfx init` を実行します。`lib/main.js` を開き、内容を以下と置き換えます。
 
     var menuitem = require("menuitems").Menuitem({
       id: "clickme",
@@ -83,40 +59,25 @@ following code:
       insertbefore: "menu_pageInfo"
     });
 
-Next, we have to declare our dependency on the `menuitems` package.
-In your add-on's `package.json` add the line:
+次に、 `menuitems` パッケージに対する依存関係を宣言する必要があります。 
+アドオンの `package.json` に、次の行を追加します。
 
 <pre>
 "dependencies": "menuitems"
 </pre>
 
-Note that due to
-[bug 663480](https://bugzilla.mozilla.org/show_bug.cgi?id=663480), if you
-add a `dependencies` line to `package.json`, and you use any modules from
-built-in packages like [`addon-kit`](packages/addon-kit/index.html), then
-you must also declare your dependency on that built-in package, like this:
+[bug 663480](https://bugzilla.mozilla.org/show_bug.cgi?id=663480) のバグのため、`package.json` に `dependencies` 行を追加し、[`addon-kit`](packages/addon-kit/index.html) などの内蔵パッケージにあるモジュールを使用する場合でも、以下のように依存関係を宣言する必要があることに注意してください。
 
 <pre>
 "dependencies": ["menuitems", "addon-kit"]
 </pre>
 
-Now we're done. Run the add-on and you'll see the new item appear in the
-`Tools` menu: select it and you'll see `info: clicked` appear in the
-console.
+これで作業は完了です。アドオンを実行すると、「ツール」メニューに新しいアイテムが表示されます。そのアイテムを選択すると、コンソールに `info: clicked` と表示されます。
 
-## Caveats ##
+## 注意 ##
 
-Eventually we expect the availability of a rich set of third party packages
-will be one of the most valuable aspects of the SDK. Right now they're a great
-way to use features not supported by the supported APIs without the
-complexity of using the low-level APIs, but there are some caveats you should
-be aware of:
+Mozilla は、サードパーティ製パッケージの豊富さが、いずれはこの ＳＤＫの大きな魅力の 1 つになると考えています。現在これらのパッケージは、面倒な低レベル API を使用せずに、現行の API では対応できない機能を実現する優れた方法です。しかし同時に、以下の点に注意する必要があります。
 
-* our support for third party packages is still fairly immature. One
-consequence of this is that it's not always obvious where to find third-party
-packages, although the
-[Community Developed Modules](https://github.com/mozilla/addon-sdk/wiki/Community-developed-modules)
-page in the SDK's GitHub Wiki lists a number of packages.
+* Mozilla によるサードパーティ製パッケージのサポートは、まだ万全とはいえません。その一例として、SDK の GitHub Wiki にある [Community Developed Modules](https://github.com/mozilla/addon-sdk/wiki/Community-developed-modules) のページにパッケージの一覧が用意されてはいますが、サードパーティ製パッケージが容易に見つからないこともあります。
 
-* because third party modules typically use low-level APIs, they may be broken
-by new releases of Firefox.
+* サードパーティ製パッケージでは、通常、低レベル API が使用されているので、Firefox の新規リリースによって機能しなくなることがあります。

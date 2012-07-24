@@ -2,34 +2,26 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<span class="aside">This tutorial assumes that you've read and followed the instructions in
-the [installation guide](dev-guide/tutorials/installation.html), to
-install and activate the SDK.</span>
+<span class="aside">このチュートリアルでは、[インストールガイド](dev-guide/tutorials/installation.html)の説明を読み、それに従って SDK をインストールし、起動していると想定しています。</span>
 
-# Getting Started With cfx #
+# cfx 入門 #
 
-To create add-ons using the SDK you'll have to get to know the `cfx`
-command-line tool. It's what you'll use for testing and packaging add-ons.
+SDK を使用してアドオンを作成するには、`cfx` コマンドライン ツールを使いこなす必要があります。`cfx` は、アドオンのテストとパッケージングに使用します。
 
-There's comprehensive
-[reference documentation](dev-guide/cfx-tool.html) covering
-everything you can do using `cfx`, but in this tutorial we'll introduce the
-three commands you need to get going:
+`cfx` の機能については、[reference documentation（リファレンスガイド）](dev-guide/cfx-tool.html) に詳細な説明がありますが、このチュートリアルでは、最低限必要な次の 3 つのコマンドについて説明します。
 
 * [`cfx init`](dev-guide/tutorials/getting-started-with-cfx.html#cfx-init)
-: creates the skeleton structure for your add-on
-* [`cfx run`](dev-guide/tutorials/getting-started-with-cfx.html#cfx-run)
-: runs an instance of Firefox with your add-on installed
-* [`cfx xpi`](dev-guide/tutorials/getting-started-with-cfx.html#cfx-xpi)
-: build an installable [XPI](https://developer.mozilla.org/en/XPI) file to
-distribute your add-on
+：アドオンのスケルトン構造を作成します。
+* [注釈の保存](dev-guide/tutorials/annotator/storing.html)
+：作成したアドオンをインストールした状態で、Firefox の新しいインスタンスを起動します。
+* [注釈の保存](dev-guide/tutorials/annotator/storing.html)
+：作成したアドオンを配布するための、インストール可能な [XPI](https://developer.mozilla.org/en/XPI) ファイルを作成します。
 
 ## <a name="cfx-init">cfx init</a> ##
 
-You use `cfx init` to create the basic skeleton for your add-on.
+`cfx init` を使用すると、アドオンの基本的なスケルトンが作成されます。
 
-Create a new directory, navigate to it in your command shell, and run
-`cfx init`:
+新しいディレクトリを作成し、コマンドシェルでそのディレクトリに移動して `cfx init` を実行します。
 
 <pre>
 mkdir my-addon
@@ -37,11 +29,9 @@ cd my-addon
 cfx init
 </pre>
 
-You don't have to create this directory under the SDK root: once you have
-activated from the SDK root, `cfx` will remember where the SDK is, and you
-will be able to use it from any directory.
+このディレクトリは必ずしも SDK ルートの下に作成する必要はありません。`cfx` はいったん SDK ルートから起動されれば、その後 SDK の場所を記憶し続けるので、どのディレクトリからでも使用できます。
 
-You'll see some output like this:
+以下に、出力例を示します。
 
 <pre>
 * lib directory created
@@ -60,15 +50,31 @@ You'll see some output like this:
 
 ## <a name="cfx-run">cfx run</a> ##
 
-Use `cfx run` to run a new instance of Firefox with your add-on installed.
-This is the command you'll use to test out your add-on while developing it.
+`cfx run` を使用すると、作成したアドオンをインストールした状態で、Firefox の新しいインスタンスが起動されます。
+これは、開発中のアドオンをテストするためのコマンドです。
 
-The main code for an add-on is always kept in a file called `main.js` in your
-add-on's `lib` directory. Open the `main.js` for this add-on, and
-add the following code:
+先ほど `cfx init` の実行によって非常に基本的なアドオンがすでに作成されているので、コードを新たに作成しなくても、次のように入力するだけで `cfx run` の動作を試すことができます。
 
-    var widgets = require("widget");
-    var tabs = require("tabs");
+<pre>
+cfx run
+</pre>
+
+このコマンドを初めて実行すると、以下のようなメッセージが表示されます。
+
+<pre>
+No 'id' in package.json: creating a new ID for you.
+package.json modified: please re-run 'cfx run'
+</pre>
+
+<img class="image-right" src="static-files/media/screenshots/widget-mozilla.png"
+alt="Mozilla icon widget" />
+
+`cfx run` をもう一度実行すると、Firefox のインスタンスが起動され、ブラウザの右下隅に、Firefox ロゴのアイコンが表示されます。アイコンをクリックすると、新しいタブが開き、[http://www.mozilla.org/](http://www.mozilla.org/) が読み込まれます。
+
+アドオンのメインコードは、常にアドオンの `lib` ディレクトリの `main.js` ファイルに保存されます。このアドオンの `main.js` を開いてみましょう。
+
+    const widgets = require("widget");
+    const tabs = require("tabs");
 
     var widget = widgets.Widget({
       id: "mozilla-link",
@@ -79,37 +85,9 @@ add the following code:
       }
     });
 
-Now type:
+このアドオンでは、`widget` と `tabs` の 2 つの SDK モジュールが使用されています。[`widget`](packages/addon-kit/widget.html) モジュールによってブラウザにボタンが追加され、[`tabs`](packages/addon-kit/tabs.html) モジュールによってタブの基本的な操作が実行されます。上のアドオンでは、Mozilla ファビコン（お気に入りアイコン）をアイコンに持つウィジェットが作成された後、Mozilla のホームページを新しいタブに読み込むクリックハンドラが追加されます。
 
-<pre>
-cfx run
-</pre>
-
-The first time you do this, you'll see a message like this:
-
-<pre>
-No 'id' in package.json: creating a new ID for you.
-package.json modified: please re-run 'cfx run'
-</pre>
-
-<img class="image-right" src="static-files/media/screenshots/widget-mozilla.png"
-alt="Mozilla icon widget" />
-
-Run `cfx run` again, and it will run an instance of Firefox. In the
-bottom-right corner of the browser you'll see an icon with the Firefox
-logo. Click the icon, and a new tab will open with
-[http://www.mozilla.org/](http://www.mozilla.org/) loaded into it.
-
-This add-on uses two SDK modules: the
-[`widget`](packages/addon-kit/widget.html) module, which enables you
-to add buttons to the browser, and the
-[`tabs`](packages/addon-kit/tabs.html) module, which enables you to
-perform basic operations with tabs. In this case, we've created a widget
-whose icon is the Mozilla favicon, and added a click handler that loads
-the Mozilla home page in a new tab.
-
-Try editing this file. For example, we could change the icon displayed
-and the URL that gets loaded:
+それでは、このファイルを編集してみましょう。例えば以下のように、表示するアイコンや読み込む URL を変更することができます。
 
     const widgets = require("widget");
     const tabs = require("tabs");
@@ -126,45 +104,32 @@ and the URL that gets loaded:
 <img class="image-right" src="static-files/media/screenshots/widget-jquery.png"
 alt="jQuery icon widget" />
 
-At the command prompt, execute `cfx run` again, and this time the icon is the
-jQuery favicon, and clicking it takes you to
-[http://www.jquery.com](http://www.jquery.com).
+コマンドプロンプトで `cfx run` をもう一度実行すると、今度はアイコンとして jQuery ファビコンが表示され、それをクリックすると [http://www.jquery.com](http://www.jquery.com) が表示されます。
 
 <div style="clear:both"></div>
 
 ## <a name="cfx-xpi">cfx xpi</a> ##
 
-You'll use `cfx run` while developing your add-on, but once you're done with
-that, you use `cfx xpi` to build an [XPI](https://developer.mozilla.org/en/XPI)
-file. This is the installable file format for Firefox add-ons. You can
-distribute XPI files yourself or publish them to
-[http://addons.mozilla.org](http://addons.mozilla.org) so other users can
-download and install it.
+`cfx run` がアドオンの開発中に使用するコマンドであるのに対し、`cfx xpi` は開発完了後に [XPI](https://developer.mozilla.org/en/XPI) ファイルをビルドするために使用します。XPI は、Firefox アドオンのインストール可能ファイル形式です。作成したファイルは、自分で配布することも、他のユーザーがダウンロードできるように [http://addons.mozilla.org](http://addons.mozilla.org) に公開することもできます。
 
-To build an XPI, just execute the command `cfx xpi` from the add-on's
-directory:
+XPI のビルドは、以下のようにアドオンのディレクトリから `cfx xpi` コマンドを実行するだけで完了します。
 
 <pre>
 cfx xpi
 </pre>
 
-You should see a message like:
+以下のようなメッセージが表示されます。
 
 <pre>
 Exporting extension to my-addon.xpi.
 </pre>
 
-The `my-addon.xpi` file can be found in the directory in which you ran
-the command.
+`my-addon.xpi` ファイルは、`cfx xpi` コマンドを実行したディレクトリに作成されます。
 
-To test it, install it in your own Firefox installation.
+作成したファイルをテストするには、自分の Firefox にアドオンをインストールします。
 
-You can do this by pressing the Ctrl+O key combination (Cmd+O on Mac) from
-within Firefox, or selecting the "Open" item from Firefox's "File" menu.
+これには、Firefox で Ctrl キー（Mac の場合は Cmd キー）を押しながら O キーを押すか、「ファイル」メニューの「ファイルを開く」を選択します。
 
-This will bring up a file selection dialog: navigate to the
-`my-addon.xpi` file, open it and follow the prompts to install the
-add-on.
+ファイルを選択するダイアログが表示されます。`my-addon.xpi` ファイルに移動してファイルを開き、プロンプトに従ってアドオンをインストールします。
 
-Now you have the basic `cfx` commands, you can try out the
-[SDK's features](dev-guide/tutorials/index.html).
+これで基本的な `cfx` コマンドを習得できました。ここからは、[SDK の各機能](dev-guide/tutorials/index.html) を実際に使用してみましょう。

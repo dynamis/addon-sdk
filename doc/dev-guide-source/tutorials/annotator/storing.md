@@ -2,40 +2,35 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Storing Annotations #
+# 注釈の保存 #
 
-Now we are able to create annotations, let's store them using the
-[`simple-storage`](packages/addon-kit/simple-storage.html) module. In
-this chapter we will cover three topics relating to persistent storage:
+これまでの作業によって、注釈を作成できるようになりました。ここでは、[`simple-storage`](packages/addon-kit/simple-storage.html) モジュールを使用して、作成した注釈を保存する機能を追加します。このセクションでは、永続的ストレージに関する以下の 3 つのトピックについて説明します。
 
-* using `simple-storage` to persist objects
-* handling exhaustion of the storage quota allocated to you
-* respecting Private Browsing
+* `simple-storage` を使用したオブジェクトの永続化
+* 割り当てられたストレージクオータを超過した場合の処理
+* プライベートブラウジングへの配慮
 
-## Storing New Annotations ##
+## 新しい注釈の保存 ##
 
-In this section we are only touching the `main.js` file.
+このセクションでは、`main.js` ファイルのみを扱います。
 
-First, import the `simple-storage` module with a declaration like:
+まず、以下のような宣言を行って `simple-storage` モジュールをインポートします。
 
     var simpleStorage = require('simple-storage');
 
-In the module scope, initialize an array which will contain the stored annotations:
+このモジュールのスコープで、保存された注釈を格納する配列を初期化します。
 
     if (!simpleStorage.storage.annotations)
       simpleStorage.storage.annotations = [];
 
-Now we'll add a function to the module scope which deals with a new
-annotation. The annotation is composed of the text the user entered and the
-"annotation anchor", which consists of the URL, element ID and element content:
+ここで、新しい注釈を処理する関数をモジュールのスコープに追加します。注釈は、ユーザーが入力したテキストに加え、URL、要素 ID、および要素コンテンツからなる「注釈アンカー」で構成されます。
 
     function handleNewAnnotation(annotationText, anchor) {
       var newAnnotation = new Annotation(annotationText, anchor);
       simpleStorage.storage.annotations.push(newAnnotation);
     }
 
-This function calls a constructor for an `Annotation` object, which we also
-need to supply:
+この関数は `Annotation` オブジェクトのコンストラクタを呼び出すので、コンストラクタも用意する必要があります。
 
     function Annotation(annotationText, anchor) {
       this.annotationText = annotationText;
@@ -44,8 +39,7 @@ need to supply:
       this.anchorText = anchor[2];
     }
 
-Now we need to link this code to the annotation editor, so that when the user
-presses the return key in the editor, we create and store the new annotation:
+このコードを注釈エディタにリンクして、ユーザーがエディタでリターンキーを押したときに、新しい注釈が作成されて保存されるようにする必要があります。
 
     var annotationEditor = panels.Panel({
       width: 220,
@@ -62,23 +56,21 @@ presses the return key in the editor, we create and store the new annotation:
       }
     });
 
-## Listing Stored Annotations ##
+## 保存された注釈のリッスン ##
 
-To prove that this works, let's implement the part of the add-on that displays
-all the previously entered annotations. This is implemented as a panel that's
-shown in response to the widget's `right-click` message.
+これが機能することを証明するため、アドオンのコードからそれまでに入力された注釈を表示する部分を実装してみましょう。ウィジェットの `right-click` メッセージに対応して表示されるパネルとして実装します。
 
-The panel has three new files associated with it:
+このパネルには、以下の 3 つの新しいファイルが関連付けられています。
 
-* a content-script which builds the panel content
-* a simple HTML file used as a template for the panel's content
-* a simple CSS file to provide some basic styling.
+* パネルのコンテンツを構築するコンテンツスクリプト
+* パネルのコンテンツのテンプレートとして使用される単純な HTML ファイル
+* 基本的なスタイルをいくつか提供する単純な CSS ファイル
 
-These three files can all go in a new subdirectory of `data` which we will call `list`.
+これら 3 種類のファイルはすべて、`data` に新しいサブディレクトリ（ここでは`list` と名付けます）を作成して保存することができます。
 
-### Annotation List Content Script ###
+### 注釈リストのコンテンツスクリプト ###
 
-Here's the annotation list's content script:
+以下は、注釈リストのコンテンツスクリプトです。
 
     self.on("message", function onMessage(storedAnnotations) {
       var annotationList = $('#annotation-list');
@@ -101,17 +93,15 @@ Here's the annotation list's content script:
         });
     });
 
-It builds the DOM for the panel from the array of annotations it is given.
+このコンテンツスクリプトでは、保存された注釈の配列からパネルの DOM を構築します。
 
-The user will be able to click links in the panel, but we want to open them in
-the main browser window rather than the panel. So the content script binds a
-click handler to the links which will send the URL to the add-on.
+ユーザーはパネルでリンクをクリックできますが、ここではパネルではなくメインブラウザウィンドウでリンクを開くことにします。そこでこのコンテンツスクリプトではクリックハンドラをリンクにバインドし、これらのリンクから URL をアドオンに送信します。
 
-Save this file in `data/list` as `annotation-list.js`.
+このファイルを `data/list` の中に `annotation-list.js` という名前で保存します。
 
-### Annotation List HTML and CSS ###
+### 注釈リストの HTML および CSS ###
 
-Here's the HTML for the annotation list:
+以下は、注釈リストの HTML です。
 
 <pre class="brush: html">
 &lt;html&gt;
@@ -140,7 +130,7 @@ Here's the HTML for the annotation list:
 
 </pre>
 
-Here's the corresponding CSS:
+以下は対応する CSS です。
 
 <script type="syntaxhighlighter" class="brush: css"><![CDATA[
 #annotation-list .annotation-details
@@ -182,12 +172,11 @@ h1
 ]]>
 </script>
 
-Save these in `data/list` as `annotation-list.html` and `annotation-list.css`
-respectively.
+これらのファイルを `data/list` の中に、それぞれ `annotation-list.html` と `annotation-list.css` という名前で保存します。
 
-### Updating main.js ###
+### main.js の更新 ###
 
-Here's the code to create the panel, which can go in the `main` function.
+以下は、パネルを作成するためのコードで、`main` 関数に挿入することができます。
 
     var annotationList = panels.Panel({
       width: 420,
@@ -204,13 +193,11 @@ Here's the code to create the panel, which can go in the `main` function.
       }
     });
 
-Since this panel's content script uses jQuery we will pass that in too: again,
-make sure the name of it matches the version of jQuery you downloaded.
+このパネルのコンテンツスクリプトでは jQuery が使用されているので、jQuery もあわせて渡します。ここでも jQuery の名前が、ダウンロードした jQuery のバージョンと一致することを確認してください。
 
-When the panel is shown we send it the array of stored annotations. When the
-panel sends us a URL we use the `tabs` module to open it in a new tab.
+パネルが表示されたら、保存されている注釈の配列をそのパネルに送信します。パネルから URL が送信された場合は、`tabs` モジュールを使用して新しいタブでその URL を開きます。
 
-Finally we need to connect this to the widget's `right-click` message:
+最後に、これをウィジェットの `right-click` メッセージに接続する必要があります。
 
     var widget = widgets.Widget({
       id: 'toggle-switch',
@@ -232,30 +219,21 @@ Finally we need to connect this to the widget's `right-click` message:
         annotationList.show();
     });
 
-This time execute `cfx xpi` to build the XPI for the add-on, and install it in
-Firefox. Activate the add-on, add an annotation, and then right-click the
-widget. You should see something like this:
+今回は、`cfx xpi` を実行してアドオンの XPI を作成し、Firefox にインストールします。その後、アドオンをアクティブ化し、注釈を追加し、ウィジェットを右クリックします。以下のような出力が表示されます。
 
 <img class="image-center"
 src="static-files/media/annotator/annotation-list.png" alt="Annotation List">
 <br>
 
 <span class="aside">
-Until now we've always run `cfx run` rather than building an XPI and installing
-the add-on in Firefox. If the annotation does not reappear when you restart
-Firefox, double check you installed the add-on and didn't just use `cfx run`
-again.</span>
-Restart Firefox, right-click the widget again, and check that the annotation
-is still there.
+これまでは、XPI を作成してアドオンを Firefox にインストールするよりも、`cfx run` を実行する方法を常に採ってきました。Firefox を再起動しても注釈が再表示されない場合は、これまでのように単に `cfx run` を実行するのではなく、アドオンをインストールしたことをもう一度確認してください。</span>
+Firefox を再起動し、再度ウィジェットを右クリックし、注釈が表示されていることを確認します。
 
-## Responding To OverQuota events ##
+## OverQuota イベントへの対応 ##
 
-Add-ons have a limited quota of storage space. If the add-on exits while
-it is over quota, any data stored since the last time it was in quota will not
-be persisted.
+アドオンのストレージ空間では、使用できるクオータに上限があります。クオータを超過したままアドオンを終了すると、クオータ超過後に保存されたすべてのデータが失われます。
 
-So we want to listen to the `OverQuota` event emitted by `simple-storage` and
-respond to it. Add the following to your add-on's `main` function:
+そのため、`simple-storage` が発する `OverQuota` イベントをリッスンしてそれに対応することは重要です。これには、以下のコードをアドオンの `main` 関数に追加します。
 
     simpleStorage.on("OverQuota", function () {
       notifications.notify({
@@ -265,40 +243,29 @@ respond to it. Add the following to your add-on's `main` function:
         simpleStorage.storage.annotations.pop();
     });
 
-Because we use a notification to alert the user, we need to import the
-`notifications` module:
+このコードでは、通知によってユーザーに警告を与えるので、以下のように `notifications` モジュールをインポートする必要があります。
 
     var notifications = require("notifications");
 
-(It should be obvious that this is an incredibly unhelpful way to deal with the
-problem. A real add-on should give the user a chance to choose which data to
-keep, and prevent the user from adding any more data until the add-on is back
-under quota.)
+（これが問題に対処する方法として、信じられないほど役立たないことは明らかです。実際のアドオンでは、保存するデータをユーザーが選択できるようにするとともに、アドオンがクオータ以下のサイズに戻るまで、データを追加できないようにする必要があります。）
 
-## Respecting Private Browsing ##
+## プライベートブラウジングへの配慮 ##
 
-Since annotations record the user's browsing history we should prevent the user
-from creating annotations while the browser is in
-[Private Browsing](http://support.mozilla.com/en-US/kb/Private%20Browsing) mode.
+注釈機能はユーザーの閲覧履歴を記録するので、ブラウザが[プライベートブラウジング](http://support.mozilla.com/en-US/kb/Private%20Browsing)モードの状態で注釈を作成できないようにする必要があります。
 
-First let's import the `private-browsing` module into `main.js`:
+まず `private-browsing` モジュールを `main.js` にインポートします。
 
     var privateBrowsing = require('private-browsing');
 
-We already have a variable `annotatorIsOn` that we use to indicate whether the
-user can enter annotations. But we don't want to use that here, because we want
-to remember the underlying state so that when they exit Private Browsing the
-annotator is back in whichever state it was in before.
+このアドオンではすでに、注釈の入力が可能かどうかを指定する変数として `annotatorIsOn` を使用していますが、その変数はここでは使用しません。なぜなら、プライベートブラウジングを終了したときに、それまでの状態にかかわらずアノテーターを再び機能させるには、その前提となるアクティブ化の状態を記憶しておく必要があるからです。
 
-So we'll implement a function defining that to enter annotations, the annotator
-must be active *and* Private Browsing must be off:
+そこでここでは、注釈を行うためにはアノテーターが起動され、*かつ*プライベートブラウジングがオフであることを要件として定義する関数を実装します。
 
     function canEnterAnnotations() {
       return (annotatorIsOn && !privateBrowsing.isActive);
     }
 
-Next, everywhere we previously used `annotatorIsOn` directly, we'll call this
-function instead:
+次に、これまで `annotatorIsOn` を直接使用していたすべての箇所で、代わりに以下の関数を呼び出します。
 
     function activateSelectors() {
       selectors.forEach(
@@ -333,8 +300,7 @@ function instead:
       }
     });
 
-We want to stop the user changing the underlying activation state when in
-Private Browsing mode, so we'll edit `toggleActivation` again:
+さらに、プライベートブラウジングモードの使用中に、前提となるアクティブ化の状態を変更できないようにするため、`toggleActivation` をもう一度以下のように編集します。
 
     function toggleActivation() {
       if (privateBrowsing.isActive) {
@@ -345,9 +311,7 @@ Private Browsing mode, so we'll edit `toggleActivation` again:
       return canEnterAnnotations();
     }
 
-Finally, inside the `main` function, we'll add the following code to handle
-changes in Private Browsing state by changing the icon and notifying the
-selectors:
+最後に、`main` 関数の中に以下のコードを追加して、プライベートブラウジングの状態が変更された場合に、アイコンが変更されセレクタに通知されるようにします。
 
     privateBrowsing.on('start', function() {
       widget.contentURL = data.url('widget/pencil-off.png');
@@ -361,9 +325,6 @@ selectors:
       }
     });
 
-Try it: execute `cfx run`, and experiment with switching the annotator on and
-off while in and out of Private Browsing mode.
+演習：`cfx run` を実行し、プライベートブラウジングモードの使用時と非使用時にそれぞれ、アノテーターのオンとオフを切り替えてください。
 
-Now we can create and store annotations, the last piece is to
-[display them when the user loads the
-page](dev-guide/tutorials/annotator/displaying.html).
+これで注釈を作成し、保存できるようになりました。次のチュートリアルでは最後の手順として、[ユーザーがページを読み込んだときに、保存されている注釈を表示](dev-guide/tutorials/annotator/displaying.html)します。

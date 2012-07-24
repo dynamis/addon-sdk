@@ -2,25 +2,18 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Open a Web Page #
+# Web ページを開く #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To open a new web page, you can use the
-[`tabs`](packages/addon-kit/tabs.html) module:
+新しい Web ページを開くには、以下のように [`tabs`](packages/addon-kit/tabs.html) モジュールを使用します。
 
     var tabs = require("tabs");
     tabs.open("http://www.example.com");
 
-This function is asynchronous, so you don't immediately get back a
-[`tab` object](packages/addon-kit/tabs.html#Tab) which you can examine.
-To do this, pass a callback function into `open()`. The callback is assigned
-to the `onReady` property, and will be passed the tab as an argument:
+この関数は非同期なので、[`tab` オブジェクト](packages/addon-kit/tabs.html#Tab) をすぐに受け取って調べることはできません。`tab` オブジェクトがすぐに返されるようにするには、コールバック関数を `open()` に渡します。これにより、コールバックが `onReady` プロパティに割り当てられ、タブが引数として渡されます。
 
     var tabs = require("tabs");
     tabs.open({
@@ -30,11 +23,9 @@ to the `onReady` property, and will be passed the tab as an argument:
       }
     });
 
-Even then, you don't get direct access to any content hosted in the tab.
+この場合も、このタブにホストされているコンテンツには直接アクセスできません。
 
-To access tab content you need to attach a script to the tab
-using `tab.attach()`. This add-on loads a page, then attaches a script to
-the page which adds a red border to it:
+タブのコンテンツにアクセスするには、`tab.attach()` を使用してタブにスクリプトを付加する必要があります。以下のアドオンでは、ページを読み込んだ後、そのページに赤い枠を追加するスクリプトが付加されます。
 
     var tabs = require("tabs");
     tabs.open({
@@ -48,10 +39,8 @@ the page which adds a red border to it:
       });
     }
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about working with tabs in the SDK, see the
-[`tabs` API reference](packages/addon-kit/tabs.html).
+SDK でのタブの使用方法の詳細については、[API リファレンス：`tabs`（英語）](packages/addon-kit/tabs.html)を参照してください。
 
-To learn more about running scripts in tabs, see the
-[tutorial on using `tab.attach()`](dev-guide/tutorials/modifying-web-pages-tab.html).
+タブでスクリプトを実行する方法の詳細については、[`tab.attach()` の使用方法についてのチュートリアル](dev-guide/tutorials/modifying-web-pages-tab.html)を参照してください。

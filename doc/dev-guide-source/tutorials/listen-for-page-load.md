@@ -2,19 +2,13 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Listen For Page Load #
+# ページ読み込みのリッスン #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-You can get notifications about new pages loading using the
-[`tabs`](packages/addon-kit/tabs.html) module. The following add-on
-listens to the tab's built-in `ready` event and just logs the URL of each
-tab as the user loads it:
+[`tabs`](packages/addon-kit/tabs.html) モジュールを使用して、新しいページが読み込まれたときに通知を受け取ることができます。以下のアドオンは、タブに内蔵されている `ready` イベントをリッスンし、ユーザーがタブに URL を読み込んだときにその URL をコンソールに出力します。
 
     require("tabs").on("ready", logURL);
 
@@ -22,11 +16,9 @@ tab as the user loads it:
       console.log(tab.url);
     }
 
-You don't get direct access to any content hosted in the tab.
+タブにホストされているコンテンツには直接アクセスできません。
 
-To access tab content you need to attach a script to the tab
-using `tab.attach()`. This add-on attaches a script to all open
-tabs. The script adds a red border to the tab's document:
+タブのコンテンツにアクセスするには、`tab.attach()` を使用してタブにスクリプトを付加する必要があります。以下のアドオンは、開いているすべてのタブにスクリプトを付加します。付加されたスクリプトは、タブ内の文書に赤い枠を追加します。
 
     require("tabs").on("ready", logURL);
 
@@ -40,16 +32,10 @@ tabs. The script adds a red border to the tab's document:
       });
     }
 
-(This example is only to show the idea: to implement something like this,
-you should instead use
-[`page-mod`](dev-guide/tutorials/modifying-web-pages-url.html),
-and specify "*" as the match-pattern.)
+（上のアドオンは、概念をわかりやすく示すための例に過ぎません。このような動作を実際に実装するには、[`page-mod`](dev-guide/tutorials/modifying-web-pages-url.html) を代わりに使用し、一致パターンとして「*」を指定します）
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about working with tabs in the SDK, see the
-[`tabs` API reference](packages/addon-kit/tabs.html). You can listen
-for a number of other tab events, including `open`, `close`, and `activate`.
+SDK でのタブの使用方法の詳細については、[API リファレンス：`tabs`（英語）](packages/addon-kit/tabs.html)を参照してください。この他にも、`open`、`close`、`activate` などのタブイベントをリッスンできます。
 
-To learn more about running scripts in tabs, see the
-[tutorial on using `tab.attach()`](dev-guide/tutorials/modifying-web-pages-tab.html).
+タブでスクリプトを実行する方法の詳細については、[`tab.attach()` の使用方法についてのチュートリアル](dev-guide/tutorials/modifying-web-pages-tab.html)を参照してください。

@@ -2,31 +2,20 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<div class="warning">Developing add-ons for Firefox Mobile is still
-an experimental feature of the SDK. Although the SDK modules used are
-stable, the setup instructions and cfx commands are likely to change.
+<div class="warning">Firefox Mobile 対応のアドオンの開発は、いまだ SDK の実験的機能です。使用されている SDK モジュールは安定していますが、セットアップ手順や cfx コマンドは変更される可能性があります。
 </div>
 
-# Developing for Firefox Mobile #
+# Firefox Mobile 対応の開発 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-Mozilla has recently decided to
-[reimplement the UI for Firefox Mobile on Android](http://starkravingfinkle.org/blog/2011/11/firefox-for-android-native-android-ui/)
- using native Android widgets instead of XUL. With the add-on SDK you
-can develop add-ons that run on this new version of Firefox Mobile as
-well as on the desktop version of Firefox.
+Mozilla は先ごろ、[Firefox Mobile on Android の UI の再実装](http://starkravingfinkle.org/blog/2011/11/firefox-for-android-native-android-ui/) を決定しました。これにより、従来の XUL に代わってネイティブな Android ウィジェットを使用した UI が実装されます。アドオン SDK では、この新しいバージョンの Firefox Mobile とデスクトップバージョンの Firefox の両方で動作するアドオンを開発できます。
 
-You can use the same code to target both desktop Firefox and Firefox
-Mobile, and just specify some extra options to `cfx run`, `cfx test`,
-and `cfx xpi` when targeting Firefox Mobile.
+デスクトップの Firefox と Firefox Mobile には同じコードを使用でき、`cfx run`、`cfx test`、`cfx xpi` で追加のオプションを指定するだけで Firefox Mobile をターゲットとすることができます。
 
-Right now only the following modules are fully functional:
+現在、完全に機能するのは、以下のモジュールのみです。
 
 * [page-mod](packages/addon-kit/page-mod.html)
 * [page-worker](packages/addon-kit/page-worker.html)
@@ -35,81 +24,61 @@ Right now only the following modules are fully functional:
 * [simple-storage](packages/addon-kit/simple-storage.html)
 * [timers](packages/addon-kit/timers.html)
 
-We're working on adding support for the other modules.
+Mozilla では、他のモジュールについてもサポートを追加できるよう取り組んでいます。
 
-This tutorial explains how to run SDK add-ons on an Android
-device connected via USB to your development machine.
-We'll use the
-[Android Debug Bridge](http://developer.android.com/guide/developing/tools/adb.html)
-(adb) to communicate between the Add-on SDK and the device.
+このチュートリアルでは、開発マシンに USB 接続された Android デバイスで SDK アドオンを実行する方法について説明します。
+アドオン SDK とデバイス間の通信には、[Android Debug Bridge](http://developer.android.com/guide/developing/tools/adb.html)（adb）を使用します。
 
 <img class="image-center" src="static-files/media/mobile-setup-adb.png"/>
 
-It's possible to use the
-[Android emulator](http://developer.android.com/guide/developing/tools/emulator.html)
-to develop add-ons for Android without access to a device, but it's slow,
-so for the time being it's much easier to use the technique described
-below.
+[Android エミュレータ](http://developer.android.com/guide/developing/tools/emulator.html) を使用すれば、デバイスにアクセスせずにアドオンを開発することができます。しかしエミュレータは低速なので、当面、ここで説明する方法を使用する方が簡単です。
 
-## Setting up the Environment ##
+## 環境の設定 ##
 
-First you'll need an
-[Android device capable of running the native version of
-Firefox Mobile](https://wiki.mozilla.org/Mobile/Platforms/Android#System_Requirements).
-Then:
+まず、[ネイティブバージョンの Firefox Mobile を実行できる Android デバイス](https://wiki.mozilla.org/Mobile/Platforms/Android#System_Requirements) を用意します。
+Android デバイスで、以下の手順を実行します。
 
-* install the
-[Nightly build of the native version of Firefox Mobile](https://wiki.mozilla.org/Mobile/Platforms/Android#Download_Nightly)
-on the device.
-* [enable USB debugging on the device (step 3 of this link only)](http://developer.android.com/guide/developing/device.html#setting-up)
+* デバイスに [Firefox Mobile の Nightly ビルド](https://wiki.mozilla.org/Mobile/Platforms/Android#Download_Nightly)をインストールします。
+* [デバイスで USB デバッグを有効にします（このリンクの手順 3 のみ）](http://developer.android.com/guide/developing/device.html#setting-up) 
 
-On the development machine:
+開発マシンで、以下の手順を実行します。
 
-* install version 1.5 or higher of the Add-on SDK
-* install the correct version of the
-[Android SDK](http://developer.android.com/sdk/index.html)
-for your device
-* using the Android SDK, install the
-[Android Platform Tools](http://developer.android.com/sdk/installing.html#components)
+* アドオン SDK のバージョン 1.5 以上をインストールします。
+*  デバイスに適したバージョンの [Android SDK](http://developer.android.com/sdk/index.html) をインストールします。
+* Android SDK を使用して、[Android Platform Tools](http://developer.android.com/sdk/installing.html#components) をインストールします。
 
-Next, attach the device to the development machine via USB.
+次に、デバイスを開発マシンに USB で接続します。
 
-Now open up a command shell. Android Platform Tools will have
-installed `adb` in the "platform-tools" directory under the directory
-in which you installed the Android SDK. Make sure the "platform-tools"
-directory is in your path. Then type:
+ここでコマンドシェルを開きます。Android SDK をインストールしたディレクトリの下にある「platform-tools」ディレクトリに、Android Platform Tools によって `adb` がインストールされています。環境変数 PATH に「platform-tools」のパスを設定してください。その後、以下を入力します。
 
 <pre>
 adb devices
 </pre>
 
-You should see some output like:
+以下のような出力が表示されます。
 
 <pre>
 List of devices attached
 51800F220F01564 device
 </pre>
 
-(The long hex string will be different.)
+（上の長い 16 進数は、表示される数値とは異なります）
 
-If you do, then `adb` has found your device and you can get started.
+これで `adb` によってデバイスが検出され、開発の準備が整いました。
 
-## Running Add-ons on Android ##
+## Android 上でのアドオンの実行 ##
 
-You can develop your add-on as normal, as long as you restrict yourself
-to the supported modules.
+サポートされている範囲でモジュールを使用する限り、通常どおりアドオンを開発できます。
 
-When you need to run the add-on, first ensure that Firefox is not running
-on the device. Then execute `cfx run` with some extra options:
+アドオンを実行する必要がある場合、まずそのデバイスで Firefox が実行されていないことを確認します。次に、オプションを指定して `cfx run` を実行します。
 
 <pre>
 cfx run -a fennec-on-device -b /path/to/adb --mobile-app fennec --force-mobile
 </pre>
 
-See ["cfx Options for Mobile Development"](dev-guide/tutorials/mobile.html#cfx-options)
-for the details of this command.
+このコマンドの詳細については、[「モバイル開発のための cfx オプション」](dev-guide/tutorials/mobile.html#cfx-options)を参照してください。
 
-In the command shell, you should see something like:
+コマンドシェルに、以下のように表示されます。
 
 <pre>
 Launching mobile application with intent name org.mozilla.fennec
@@ -123,31 +92,25 @@ info: starting
 zerdatime 1329258528988 - browser chrome startup finished.
 </pre>
 
-This will be followed by lots of debug output.
+この後、多くのデバッグ出力が続きます。
 
-On the device, you should see Firefox launch with your add-on installed.
+デバイス上では、インストールしたアドオンとともに Firefox が起動します。
 
-`console.log()` output from your add-on is written to the command shell,
-just as it is in desktop development. However, because there's a
-lot of other debug output in the shell, it's not easy to follow.
-The command `adb logcat` prints `adb`'s log, so you can filter the
-debug output after running the add-on. For example, on Mac OS X
-or Linux you can use a command like:
+アドオンからの `console.log()` 出力は、デスクトップ開発の場合と同様に、コマンドシェルに書き込まれます。しかし、シェルには他の多くのデバッグ出力が書き込まれるので、理解するのは容易ではありません。`adb logcat` コマンドを実行すると `adb` のログが表示され、アドオンの実行後にデバッグ出力をフィルタ処理することができます。例えば、Mac OS X または Linux では以下のようなコマンドを使用できます。
 
 <pre>
 adb logcat | grep info:
 </pre>
 
-Running `cfx test` is identical:
+これは `cfx test` を実行しても同じです。
 
 <pre>
 cfx test -a fennec-on-device -b /path/to/adb --mobile-app fennec --force-mobile
 </pre>
 
-## <a name="cfx-options">cfx Options for Mobile Development</a> ##
+## <a name="cfx-options">モバイル開発のための cfx オプション</a> ##
 
-As you see in the quote above, `cfx run` and `cfx test` need four options to
-work on Android devices.
+上のコード例が示すように、`cfx run` と `cfx test` を Android デバイスで使用するには、以下の 4 つのオプションが必要です。
 
 <table>
 <colgroup>
@@ -160,20 +123,16 @@ work on Android devices.
     <code>-a fennec-on-device</code>
   </td>
   <td>
-    This tells the Add-on SDK which application will host the
-    add-on, and should be set to "fennec-on-device" when running
-    an add-on on Firefox Mobile on a device.
-  </td>
+    Add-on SDK に対して、アドオンをホストするアプリケーションを指定するオプションです。デバイス上の Firefox Mobile でアドオンを実行する場合は、「fennec-on-device」に設定します。
+   </td>
 </tr>
 <tr>
   <td>
     <code>-b /path/to/adb</code>
   </td>
   <td>
-    <p>As we've seen, <code>cfx</code> uses the Android Debug Bridge (adb)
-    to communicate with the Android device. This tells <code>cfx</code>
-    where to find the <code>adb</code> executable.</p>
-    <p>You need to supply the full path to the <code>adb</code> executable.</p>
+    <p>前述のように、<code>cfx</code> は Android Debug Bridge（adb）を使用して Android デバイスと通信します。このオプションは、<code>cfx</code> に対して <code>adb</code> 実行可能ファイルの場所を指定します。</p>
+    <p><code>adb</code> 実行可能ファイルへの絶対パスを指定する必要があります。</p>
   </td>
 </tr>
 <tr>
@@ -181,24 +140,21 @@ work on Android devices.
     <code>--mobile-app</code>
   </td>
   <td>
-    <p>This is the name of the <a href="http://developer.android.com/reference/android/content/Intent.html">
-    Android intent</a>. Its value depends on the version of Firefox Mobile
-    that you're running on the device:</p>
+    <p><a href="http://developer.android.com/reference/android/content/Intent.html"> Android インテント</a>の名前を指定するオプションです。この値は、デバイスで実行している Firefox Mobile のバージョンによって異なります。</p>
     <ul>
-      <li><code>fennec</code>: if you're running Nightly</li>
-      <li><code>fennec_aurora</code>: if you're running Aurora</li>
-      <li><code>firefox_beta</code>: if you're running Beta</li>
-      <li><code>firefox</code>: if you're running Release</li>
+      <li><code>fennec</code>：Nightly を実行している場合</li>
+      <li><code>fennec_aurora</code>：Aurora を実行している場合</li>
+      <li><code>firefox_beta</code>：Beta を実行している場合</li>
+      <li><code>firefox</code>：Release を実行している場合</li>
     </ul>
-    <p>If you're not sure, run a command like this (on OS X/Linux, or the equivalent on Windows):</p>
+    <p>バージョンが不明な場合は、以下のようなコマンドを実行します（OS X または Linux の場合。Windows ではこれに相当するコマンドを実行)。</p>
     <pre>adb shell pm list packages | grep mozilla</pre>
-    <p>You should see "package" followed by "org.mozilla." followed by a string.
-    The final string is the name you need to use. For example, if you see:</p>
+    <p>「package」の後に「org.mozilla.」と表示され、その後に文字列が続きます。
+    最後の文字列が、ここで使用する名前です。例えば、以下が表示された場合、</p>
     <pre>package:org.mozilla.fennec</pre>
-    <p>...then you need to specify:</p>
+    <p>以下を指定します。</p>
     <pre>--mobile-app fennec</pre>
-    <p>This option is not required if you have only one Firefox application
-    installed on the device.</p>
+    <p>デバイスに 1 つの Firefox のみをインストールしている場合、このオプションは不要です。</p>
   </td>
 </tr>
 <tr>
@@ -206,37 +162,34 @@ work on Android devices.
     <code>--force-mobile</code>
   </td>
   <td>
-    <p>This is used to force compatibility with Firefox Mobile, and should
-    always be used when running on Firefox Mobile.</p>
+    <p>Firefox Mobile との互換性を強制するために使用するオプションです。Firefox Mobile で実行する場合は、常に使用する必要があります。</p>
   </td>
 </tr>
 </table>
 
-## Packaging Mobile Add-ons ##
+## モバイルアドオンのパッケージ化 ##
 
-To package a mobile add-on as an XPI, use the command:
+モバイルアドオンを XPI としてパッケージ化するには、以下のコマンドを使用します。
 
 <pre>
 cfx xpi --force-mobile
 </pre>
 
-Actually installing the XPI on the device is a little tricky. The easiest way is
-probably to copy the XPI somewhere on the device:
+実際、デバイス上に XPI をインストールするには、少し注意が必要です。最も簡単な方法は、おそらく XPI をデバイスのどこかにコピーすることです。
 
 <pre>
 adb push my-addon.xpi /mnt/sdcard/
 </pre>
 
-Then open Firefox Mobile and type this into the address bar:
+次に Firefox Mobile を開き、アドレスバーに以下を入力します。
 
 <pre>
 file:///mnt/sdcard/my-addon.xpi
 </pre>
 
-The browser should open the XPI and ask if you
-want to install it.
+ブラウザで XPI が開き、インストールするかどうかを尋ねるメッセージが表示されます。
 
-Afterwards you can delete it using `adb` as follows:
+その後、以下のように `adb` を使用して XPI を削除できます。
 
 <pre>
 adb shell

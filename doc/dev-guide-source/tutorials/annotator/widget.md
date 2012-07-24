@@ -2,38 +2,27 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Implementing the Widget #
+# ウィジェットの実装 #
 
-We want the widget to do two things:
+ウィジェットには、次の 2 つの機能を実装します。
 
 <span class="aside">
-[Bug 634712](https://bugzilla.mozilla.org/show_bug.cgi?id=634712) asks that
-the widget API should emit separate, or at least distinguishable, events for
-left and right mouse clicks, and when it is fixed this widget won't need a
-content script any more.</span>
+[Bug 634712](https://bugzilla.mozilla.org/show_bug.cgi?id=634712) のバグのため、ウィジェット API は左右のマウスクリックに対して別個の（または少なくとも区別可能な）イベントを発生させる必要があります。このバグが修正されれば、このウィジェットのコンテンツスクリプトは不要になります。</span>
 
-* On a left-click, the widget should activate or deactivate the annotator.
-* On a right-click, the widget should display a list of all the annotations
-the user has created.
+* ウィジェットを左クリックすると、アノテーターのオンとオフが切り替わります。
+* 右クリックすると、ユーザーが作成したすべての注釈のリストが表示されます。
 
-Because the widget's `click` event does not distinguish left and right mouse
-clicks, we'll use a content script to capture the click events and send the
-corresponding message back to our add-on.
+ウィジェットの `click` イベントは左右のマウスクリックを区別しないので、コンテンツスクリプトを使用してクリックイベントを取得し、対応するメッセージをアドオンに送り返します。
 
-The widget will have two icons: one to display when it's active, one to display
-when it's inactive.
+ウィジェットでは、アドオンがアクティブであることを示すアイコンと、非アクティブであることを示すアイコンの 2 つのアイコンが使用されます。
 
-So there are three files we'll need to create: the widget's content script and
-its two icons.
+したがって、ウィジェットのコンテンツスクリプトと 2 つのアイコンの合計 3 つのファイルを作成する必要があります。
 
-Inside the `data` subdirectory create another subdirectory `widget`. We'll
-keep the widget's files here. (Note that this isn't mandatory: you could just
-keep them all under `data`.  But it seems tidier this way.)
+`data` サブディレクトリの中に、別のサブディレクトリ `widget` を作成します。ウィジェットのファイルはここに保存します（このことは必須ではありません。すべてのファイルを `data` の下に置くことも可能です。しかしディレクトリを分けた方が、整理された感じがします）。
 
-## The Widget's Content Script ##
+## ウィジェットのコンテンツスクリプト ##
 
-The widget's content script just listens for left- and right- mouse clicks and
-posts the corresponding message to the add-on code:
+ウィジェットのコンテンツスクリプトは、以下のように左右のマウスクリックをリッスンして、対応するメッセージをアドオンコードに送信するだけのスクリプトです。
 
     this.addEventListener('click', function(event) {
       if(event.button == 0 && event.shiftKey == false)
@@ -44,20 +33,20 @@ posts the corresponding message to the add-on code:
         event.preventDefault();
     }, true);
 
-Save this in your `data/widget` directory as `widget.js`.
+このスクリプトを `data/widget` ディレクトリに「widget.js」という名前で保存します。
 
-## The Widget's Icons ##
+## ウィジェットのアイコン ##
 
-You can copy the widget's icons from here:
+ウィジェットのアイコンは、ここからコピーできます。
 
 <img style="margin-left:40px; margin-right:20px;" src="static-files/media/annotator/pencil-on.png" alt="Active Annotator">
 <img style="margin-left:20px; margin-right:20px;" src="static-files/media/annotator/pencil-off.png" alt="Inactive Annotator">
 
-(Or make your own if you're feeling creative.) Save them in your `data/widget` directory.
+（もちろん、独自のアイコンを作成して使用することもできます。）アイコンファイルは `data/widget` ディレクトリに保存してください。
 
 ## main.js ##
 
-Now in the `lib` directory open `main.js` and add the following code:
+次に `lib` ディレクトリで `main.js` を開き、内容を以下と置き換えます。
 
     var widgets = require('widget');
     var data = require('self').data;
@@ -91,25 +80,19 @@ Now in the `lib` directory open `main.js` and add the following code:
       });
     }
 
-The annotator is inactive by default. It creates the widget and responds to
-messages from the widget's content script by toggling its activation state.
-<span class="aside">Note that due to
-[bug 626326](https://bugzilla.mozilla.org/show_bug.cgi?id=626326) the add-on
-bar's context menu is displayed, despite the `event.preventDefault()` call
-in the widget's content script.</span>
-Since we don't have any code to display annotations yet, we just log the
-right-click events to the console.
+アノテーターは、デフォルトで非アクティブです。アクティブ化の状態を切り替えることで、ウィジェットが作成され、ウィジェットのコンテンツスクリプトからのメッセージに対して応答が行われます。 
 
-Now from the `annotator` directory type `cfx run`. You should see the widget
-in the add-on bar:
+<span class="aside">[bug 626326](https://bugzilla.mozilla.org/show_bug.cgi?id=626326) のバグのために、ウィジェットのコンテンツスクリプトで `event.preventDefault()` 呼び出しても、アドオンバーのコンテキストメニューが表示されます。</span>
+
+まだ注釈を表示するコードが存在しないので、右クリックイベントのみがコンソールにログとして出力されます。
+
+ここで、`annotator` ディレクトリで `cfx run` を入力します。以下の図のように、アドオンバーにウィジェットが表示されます。
 
 <div align="center">
 <img src="static-files/media/annotator/widget-icon.png" alt="Widget Icon">
 </div>
 <br>
 
-Left- and right-clicks should produce the appropriate debug output, and a
-left-click should also change the widget icon to signal that it is active.
+左右のボタンをクリックすると、それぞれに対応するデバッグ出力が生成されます。また左クリックした場合は、同時にウィジェットアイコンがアクティブに変化します。
 
-Next we'll add the code to
-[create annotations](dev-guide/tutorials/annotator/creating.html).
+次のチュートリアルでは、[注釈を作成](dev-guide/tutorials/annotator/creating.html)するコードを追加します。

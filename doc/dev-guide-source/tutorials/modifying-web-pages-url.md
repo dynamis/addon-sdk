@@ -2,27 +2,20 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Modifying Web Pages Based on URL #
+# URL に基づいた Web ページの変更 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To modify any pages that match a particular pattern
-(for example, "http://example.org/") as they are loaded, use the
-[`page-mod`](packages/addon-kit/page-mod.html) module.
+特定のパターン（例えば、「http://example.org/」）に一致するページを読み込んだときにそのページを変更するには、[`page-mod`](packages/addon-kit/page-mod.html) モジュールを使用します。
 
-To create a page-mod you need to specify two things:
+page-mod を作成するには、以下の 2 つを指定する必要があります。
 
-* one or more scripts to run. Because their job is to interact with web
-content, these scripts are called *content scripts*.
-* one or more patterns to match the URLs for the pages you want to modify
+* 実行する 1 つまたは複数のスクリプト。Web コンテンツとのやりとりを目的としたスクリプトなので、*コンテンツスクリプト*と呼ばれます。
+* 変更するページの URL を検出するための 1 つまたは複数の一致パターン
 
-Here's a simple example. The content script is supplied as the `contentScript`
-option, and the URL pattern is given as the `include` option:
+以下に単純な例を示します。コンテンツスクリプトは `contentScript` オプションとして指定します。 
 
     // Import the page-mod API
     var pageMod = require("page-mod");
@@ -36,43 +29,37 @@ option, and the URL pattern is given as the `include` option:
                      ' "<h1>Page matches ruleset</h1>";'
     });
 
-Try it out:
+演習：
 
-* create a new directory and navigate to it
-* run `cfx init`
-* open the `lib/main.js` file, and add the code above
-* run `cfx run`, then run `cfx run` again
-* open [ietf.org](http://www.ietf.org) in the browser window that opens
+* 新しいディレクトリを作成し、そのディレクトリに移動します。
+* `cfx init` を実行します。
+* `lib/main.js` ファイルを開き、その内容を上のコードと置き換えます。
+* `cfx run` を実行した後、`cfx run` を再度実行します。
+* 開いたブラウザウィンドウで、[ietf.org](http://www.ietf.org) を開きます。
 
-This is what you should see:
+これにより、以下が表示されます。
 
 <img  class="image-center" src="static-files/media/screenshots/pagemod-ietf.png"
 alt="ietf.org eaten by page-mod" />
 
-## Specifying the Match Pattern ##
+## 一致パターンの指定 ##
 
-The match pattern uses the
-[`match-pattern`](packages/api-utils/match-pattern.html)
-syntax. You can pass a single match-pattern string, or an array.
+一致パターンの指定には、[`match-pattern`](packages/api-utils/match-pattern.html) 構文を使用します。match-pattern 文字列は個別に渡すことも、配列として渡すこともできます。
 
-## Keeping the Content Script in a Separate File ##
+## 別ファイルでのコンテンツスクリプトの管理 ##
 
-In the example above we've passed in the content script as a string. Unless
-the script is extremely simple, you should instead maintain the script as a
-separate file. This makes the code easier to maintain, debug, and review.
+上の例では、コンテンツスクリプトを文字列として渡しました。しかし、きわめて単純なスクリプトでない限り、スクリプトは別のファイルに保存して管理してください。これにより、コードの管理、デバッグ、レビューが容易になります。
 
-To do this, you need to:
+スクリプトを別のファイルに保存するには、以下の手順に従います。
 
-* save the script in your add-on's `data` directory
-* use the `contentScriptFile` option instead of `contentScript`, and pass
-it the URL for the script. The URL can be obtained using `self.data.url()`
+* アドオンの `data` ディレクトリにスクリプトを保存します。
+* `contentScript` の代わりに `contentScriptFile` オプションを使用し、スクリプトの URL を渡します。URL は `self.data.url()` を使用して取得できます。 
 
-For example, if we save the script above under the add-on's `data` directory
-in a file called `my-script.js`:
+上のスクリプトを別ファイルとして管理する場合、例えば、アドオンの `data` ディレクトリの下の `my-script.js` というファイルに以下のコードを書き、保存します。
 
     document.body.innerHTML = "<h1>Page matches ruleset</h1>";
 
-We can load this script by changing the page-mod code like this:
+このスクリプトを読み込むには、page-mod コードを以下のように変更します。
 
     // Import the page-mod API
     var pageMod = require("page-mod");
@@ -87,17 +74,13 @@ We can load this script by changing the page-mod code like this:
       contentScriptFile: self.data.url("my-script.js")
     });
 
-## Loading Multiple Content Scripts ##
+## 複数のコンテンツスクリプトの読み込み ##
 
-You can load more than one script, and the scripts can interact
-directly with each other. So, for example, you could rewrite
-`my-script.js` to use jQuery:
+スクリプトは複数個読み込むことができます。またスクリプトは相互に直接やりとりすることが可能です。例えば、jQuery を使用して `my-script.js` を以下のように書き換えることができます。
 
     $("body").html("<h1>Page matches ruleset</h1>");
 
-Then download jQuery to your add-on's `data` directory, and
-load the script and jQuery together (making sure to load jQuery
-first):
+次に、アドオンの `data` ディレクトリに jQuery をダウンロードし、スクリプトと jQuery を一緒に読み込みます（必ず jQuery を先に読み込んでください）。
 
     // Import the page-mod API
     var pageMod = require("page-mod");
@@ -113,9 +96,7 @@ first):
                           self.data.url("my-script.js")]
     });
 
-You can use both `contentScript` and `contentScriptFile`
-in the same page-mod: if you do this, scripts loaded using
-`contentScript` are loaded first:
+`contentScript` と `contentScriptFile` は、同じ page-mod 内で使用できます。その場合、`contentScript` で指定したスクリプトが先に読み込まれます。
 
     // Import the page-mod API
     var pageMod = require("page-mod");
@@ -131,26 +112,18 @@ in the same page-mod: if you do this, scripts loaded using
       contentScript: '$("body").html("<h1>Page matches ruleset</h1>");'
     });
 
-Note, though, that you can't load a script from a web site. The script
-must be loaded from `data`.
+スクリプトを Web サイトから読み込めないことに注意してください。スクリプトは `data` ディレクトリから読み込む必要があります。
 
-## Communicating With the Content Script ##
+## コンテンツスクリプトとのやりとり ##
 
-Your add-on script and the content script can't directly
-access each other's variables or call each other's functions, but they
-can send each other messages.
+アドオンスクリプトとコンテンツスクリプトは、互いの変数に直接アクセスすることも、互いの関数を呼び出すこともできませんが、相互にメッセージを送信することは可能です。
 
-To send a
-message from one side to the other, the sender calls `port.emit()` and
-the receiver listens using `port.on()`.
+アドオンスクリプトとコンテンツスクリプトの間でメッセージを送信するには、送信側が `port.emit()` を呼び出し、受信側が `port.on()` を使用してリッスンします。
 
-* In the content script, `port` is a property of the global `self` object.
-* In the add-on script, you need to listen for the `onAttach` event to get
-passed an object that contains `port`.
+* コンテンツスクリプトで、`port` はグローバルオブジェクト `self` のプロパティです。
+* アドオンスクリプトでは、`onAttach` イベントをリッスンして、`port` を含むオブジェクトを渡す必要があります。
 
-Let's rewrite the example above to pass a message from the add-on to
-the content script. The message will contain the new content to insert into
-the document. The content script now needs to look like this:
+上のコード例を書き換えて、アドオンからコンテンツスクリプトにメッセージを渡しましょう。メッセージにはドキュメントに挿入する新しいコンテンツが格納されます。書き換え後のコンテンツスクリプトは、以下のようになります。
 
     // "self" is a global object in content scripts
     // Listen for a message, and replace the document's
@@ -159,7 +132,7 @@ the document. The content script now needs to look like this:
       document.body.innerHTML = "<h1>" + message + "</h1>";
     });
 
-In the add-on script, we'll send the content script a message inside `onAttach`:
+アドオンスクリプトで、コンテンツスクリプトに対し、`onAttach` の中のメッセージを送信します。
 
     // Import the page-mod API
     var pageMod = require("page-mod");
@@ -178,19 +151,15 @@ In the add-on script, we'll send the content script a message inside `onAttach`:
       }
     });
 
-The `replacePage` message isn't a built-in message: it's a message defined by
-the add-on in the `port.emit()` call.
+`replacePage` メッセージは内蔵のメッセージではなく、アドオンの `port.emit()` 呼び出しによって定義されたメッセージです。
 
 <div class="experimental">
 
-## Injecting CSS ##
+## CSS のインジェクション ##
 
-**Note that the feature described in this section is experimental
-at the moment: we'll very probably continue to support the feature,
-but details of the API might need to change.**
+**このセクションで説明する機能は、現時点ではまだ実験的です。この機能はおそらく今後も引き続きサポートされますが、API の詳細が変更されることがあります。**
 
-Rather than injecting JavaScript into a page, you can inject CSS by
-setting the page-mod's `contentStyle` option:
+ページに JavaScript をインジェクションするのではなく、page-mod の `contentStyle` オプションを設定して CSS をインジェクションすることができます。
 
     var pageMod = require("page-mod").PageMod({
       include: "*",
@@ -199,29 +168,17 @@ setting the page-mod's `contentStyle` option:
                     "}"
     });
 
-As with `contentScript`, there's a corresponding `contentStyleFile` option
-that's given the URL of a CSS file in your "data" directory, and it is
-good practice to use this option in preference to `contentStyle` if the
-CSS is at all complex:
+`contentScript` と同様に、対応する `contentStyleFile` オプションを使用して「data」ディレクトリにある CSS の URL を指定することができます。CSS が非常に複雑な場合は、`contentStyle` よりもこのオプションを優先して使用することをお勧めします。
 
     var pageMod = require("page-mod").PageMod({
       include: "*",
       contentStyleFile: require("self").data.url("my-style.css")
     });
 
-You can't currently use relative URLs in style sheets loaded with
-`contentStyle` or `contentStyleFile`. If you do, the files referenced
-by the relative URLs will not be found.
-
-To learn more about this, and read about a workaround, see the
-[relevant section in the page-mod API documentation](packages/addon-kit/page-mod.html#Working_with_Relative_URLs_in_CSS_Rules).
-
 </div>
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about page-mod, see its
-[API reference page](packages/addon-kit/page-mod.html).
+page-mod の詳細については、[API リファレンスページ（英語）](packages/addon-kit/page-mod.html) を参照してください。
 
-To learn more about content scripts, see the
-[content scripts guide](dev-guide/guides/content-scripts/index.html).
+コンテンツスクリプトの詳細については、[コンテンツスクリプトガイド（英語）](dev-guide/guides/content-scripts/index.html)を参照してください。

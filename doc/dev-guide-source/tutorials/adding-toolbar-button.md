@@ -2,24 +2,20 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Adding a Button to the Toolbar #
+# ツールバーへのボタンの追加 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To add a button to the toolbar, use the
-[`widget`](packages/addon-kit/widget.html) module.
+ツールバーにボタンを追加するには、[`widget`](packages/addon-kit/widget.html) モジュールを使用します。
 
-Create a new directory, navigate to it, and execute `cfx init`.
-Then open the file called "main.js" in the "lib" directory and
-add the following code to it:
+`cfx init` で作成されるデフォルトのアドオンではウィジェットが使用されているので、それを例にとって説明しましょう。[`cfx init`](dev-guide/tutorials/getting-started-with-cfx.html#cfx-init) を紹介するチュートリアルをまだ完了していない場合は、まずそれを完了した後、このページに戻ってください。
 
-    var widgets = require("widget");
-    var tabs = require("tabs");
+新しいディレクトリを作成し、そのディレクトリに移動して `cfx init` を実行します。その後、「lib」ディレクトリで「main.js」ファイルを開きます。
+
+    const widgets = require("widget");
+    const tabs = require("tabs");
 
     var widget = widgets.Widget({
       id: "mozilla-link",
@@ -30,26 +26,20 @@ add the following code to it:
       }
     });
 
-The widget is added to the "Add-on Bar" at the bottom of the browser window:
+ウィジェットが、ブラウザウィンドウの一番下の「アドオンバー」に追加されます。
 
 <img class="image-right" src="static-files/media/screenshots/widget-mozilla.png"
 alt="Mozilla icon widget" />
 
-You can't change the initial location for the widget, but the user can move
-it to a different toolbar. The `id` attribute is mandatory, and is used to
-remember the position of the widget, so you should not change it in subsequent
-versions of the add-on.
+開発者はウィジェットを最初の場所から移動できませんが、ユーザーはウィジェットを別のツールバーに移動することができます。`id` はウィジェットの位置を記憶するための必須の属性なので、このアドオンの後続のバージョンでも変更しないでください。
 
-Clicking the button opens [http://www.mozilla.org](http://www.mozilla.org).
+ボタンをクリックすると、[http://www.mozilla.org](http://www.mozilla.org) が開きます。
 
 <div style="clear:both"></div>
 
-## Specifying the Icon ##
+## アイコンの指定 ##
 
-If you're using the widget to make a toolbar button, specify the icon to
-display using `contentURL`: this may refer to a remote file as in the
-example above, or may refer to a local file. The example below will load
-an icon file called "my-icon.png" from the add-on's `data` directory:
+ウィジェットを使用してツールバーボタンを作成する場合、表示するアイコンを `contentURL` で指定します。アイコンには、上の例のようにリモートファイルを指定することも、ローカルファイルを指定することもできます。下の例では、アドオンの `data` ディレクトリから「my-icon.png」というアイコンファイルを読み込みます。
 
     var widgets = require("widget");
     var tabs = require("tabs");
@@ -64,24 +54,15 @@ an icon file called "my-icon.png" from the add-on's `data` directory:
       }
     });
 
-You can change the icon at any time by setting the widget's `contentURL`
-property.
+アイコンは、ウィジェットの `contentURL` プロパティを設定していつでも変更できます。
 
-## Responding To the User ##
+## ユーザーの操作への対応 ##
 
-You can listen for `click`, `mouseover`, and `mouseout` events by passing
-handler functions as the corresponding constructor options. The widget
-example above assigns a listener to the `click` event using the `onClick`
-option, and there are similar `onMouseover` and `onMouseout` options.
+`click`、`mouseover`、`mouseout` イベントをリッスンするには、対応するコンストラクタオプションとしてハンドラ関数を渡します。上のウィジェットの例では、`onClick` オプションを使用して `click` イベントにリスナーを割り当てています。これと同様の `onMouseover` オプションや `onMouseout` オプションも用意されています。
 
-To handle user interaction in more detail, you can attach a content
-script to the widget. Your add-on script and the content script can't
-directly access each other's variables or call each other's functions, but
-they can send each other messages.
+ユーザー操作に対してより複雑な処理を行うには、ウィジェットにコンテンツスクリプトを付加します。アドオンスクリプトとコンテンツスクリプトは、互いの変数に直接アクセスすることも、互いの関数を呼び出すこともできませんが、相互にメッセージを送信することは可能です。
 
-Here's an example. The widget's built-in `onClick` property does not
-distinguish between left and right mouse clicks, so to do this we need
-to use a content script. The script looks like this:
+例を挙げて説明しましょう。ウィジェットに内蔵された `onClick` プロパティではマウスの右クリックと左クリックが区別されないので、これを区別するにはコンテンツスクリプトを使用する必要があります。このスクリプトは、以下のようになります。
 
     window.addEventListener('click', function(event) {
       if(event.button == 0 && event.shiftKey == false)
@@ -92,20 +73,16 @@ to use a content script. The script looks like this:
         event.preventDefault();
     }, true);
 
-It uses the standard DOM `addEventListener()` function to listen for click
-events, and handles them by sending the corresponding message to the main
-add-on code. Note that the messages "left-click" and "right-click" are not
-defined in the widget API itself, they're custom events defined by the add-on
-author.
+このスクリプトでは、標準の DOM `addEventListener()` 関数を使用してクリックイベントがリッスンされ、イベントが発生した場合、対応するメッセージがメインのアドオンコードに送信されます。「left-click」および「right-click」の2つのメッセージは、ウィジェット API 自体で定義されているのではなく、アドオン作成者が定義したカスタムイベントであることに注意してください。
 
-Save this script in your `data` directory as "click-listener.js".
+このスクリプトを `data` ディレクトリに「click-listener.js」という名前で保存します。
 
-Next, modify `main.js` to:
+次に、`main.js` が以下の動作を行うように変更します。
 
 <ul>
-<li>pass in the script by setting the <code>contentScriptFile</code>
-property</li>
-<li>listen for the new events:</li>
+<li><code>contentScriptFile</code> プロパティを設定してスクリプトを渡します。</li>
+
+<li>新しいイベントをリッスンします。</li>
 </ul>
 
     var widgets = require("widget");
@@ -127,10 +104,10 @@ property</li>
       console.log("right-click");
     });
 
-Now execute `cfx run` again, and try right- and left-clicking on the button.
-You should see the corresponding string written to the command shell.
+ここで `cfx run` を再度実行し、左右のマウスボタンをクリックしてみます。
+対応する文字列が、コマンドシェルに書き込まれるのを確認してください。
 
-## Attaching a Panel ##
+## パネルの付加 ##
 
 <!-- The icon the widget displays, shown in the screenshot, is taken from the
 Circular icon set, http://prothemedesign.com/circular-icons/ which is made
@@ -140,8 +117,7 @@ http://creativecommons.org/licenses/by/2.5/ -->
 <img class="image-right" src="static-files/media/screenshots/widget-panel-clock.png"
 alt="Panel attached to a widget">
 
-If you supply a `panel` object to the widget's constructor, then the panel
-will be shown when the user clicks the widget:
+ウィジェットのコンストラクタで `panel` オブジェクトを指定すると、ユーザーがウィジェットをクリックしたときにパネルが表示されます。
 
     data = require("self").data
 
@@ -158,13 +134,10 @@ will be shown when the user clicks the widget:
       panel: clockPanel
     });
 
-To learn more about working with panels, see the tutorial on
-[displaying a popup](dev-guide/tutorials/display-a-popup.html).
+パネルの操作の詳細については、[ポップアップの表示](dev-guide/tutorials/display-a-popup.html) のチュートリアルを参照してください。
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about the widget module, see its
-[API reference documentation](packages/addon-kit/widget.html).
+widget モジュールの詳細については、[API リファレンスのドキュメント（英語）](packages/addon-kit/widget.html) を参照してください。
 
-To learn more about content scripts, see the
-[content scripts guide](dev-guide/guides/content-scripts/index.html).
+コンテンツスクリプトの詳細については、[コンテンツスクリプトガイド（英語）](dev-guide/guides/content-scripts/index.html)を参照してください。

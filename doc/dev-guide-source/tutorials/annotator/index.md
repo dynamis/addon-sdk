@@ -2,30 +2,23 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Annotator: a More Complex Add-on #
+# アノテーター：より複雑なアドオン #
 
-In this tutorial we'll build an add-on that uses most of the modules in the
-addon-kit package.
+このチュートリアルでは、アドオンキットパッケージのほとんどのモジュールを使用してアドオンを作成します。
 
-The add-on is an annotator: it enables the user to select elements of web pages
-and enter notes (annotations) associated with them. The annotator stores the
-notes. Whenever the user loads a page containing annotated elements these
-elements are highlighted, and if the user moves the mouse over an annotated
-element its annotation is displayed.
+ここで作成するアドオンはアノテーターです。ユーザーはこのアドオンを使用して、Web ページの要素を選択し、それに注釈（アノテーション）を入力して関連付けることができます。アノテーターはこれらの注釈を保存します。ユーザーが注釈付き要素を含むページを読み込むと、これらの要素がハイライトされます。また注釈付き要素にマウスを合わせると、注釈が表示されます。
 
-Next we'll give a quick overview of the annotator's design, then go through
-the implementation, step by step.
+次のセクションでアノテーターの設計を簡単に概観した後、実装作業を順を追って説明します。
 
-If you want to refer to the complete add-on you can find it under the
-`examples` directory.
+完成したアドオンは、`examples` ディレクトリの下に用意されていますのでご参照ください。
 
-* [Design Overview](dev-guide/tutorials/annotator/overview.html)
+* [設計概要](dev-guide/tutorials/annotator/overview.html)
 
-* [Implementing the Widget](dev-guide/tutorials/annotator/widget.html)
+* [ウィジェットの実装](dev-guide/tutorials/annotator/widget.html)
 
-* [Creating Annotations](dev-guide/tutorials/annotator/creating.html)
+* [注釈の作成](dev-guide/tutorials/annotator/creating.html)
 
-* [Storing Annotations](dev-guide/tutorials/annotator/storing.html)
+* [注釈の保存](dev-guide/tutorials/annotator/storing.html)
 
-* [Displaying Annotations](dev-guide/tutorials/annotator/displaying.html)
+* [注釈の表示](dev-guide/tutorials/annotator/displaying.html)
 

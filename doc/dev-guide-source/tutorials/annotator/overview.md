@@ -2,62 +2,44 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Annotator Design Overview #
+# アノテーターの設計概要 #
 
-The annotator uses content scripts to build user interfaces, get user input,
-and examine the DOM of pages loaded by the user.
+アノテーターはコンテンツスクリプトを使用してユーザーインターフェイスを構築し、ユーザー入力を取得し、ユーザーが読み込んだページの DOM を調べます。
 
-Meanwhile the `main` module contains the application logic and mediates
-interactions between the different SDK objects.
+一方、`main` モジュールにはアプリケーションロジックが格納され、異なる SDK オブジェクト間でのやりとりを調整します。
 
-We could represent the basic interactions between the `main` module and the
-various content scripts like this:
+`main` モジュールと多様なコンテンツスクリプトの間の基本的なやりとりは、以下の図のように表すことができます。
 
 <img class="image-center"
 src="static-files/media/annotator/annotator-design.png" alt="Annotator Design">
 
-## User Interface ##
+## ユーザーインターフェイス ##
 
-The annotator's main user interface consists of a widget and three panels.
+アノテーターの主要なユーザーインターフェイスは、ウィジェットと 3 つのパネルで構成されます。
 
-* The widget is used to switch the annotator on and off, and to display a list
-of all the stored annotations.
-* The **annotation-editor** panel enables the user to enter a new annotation.
-* The **annotation-list** panel shows a list of all stored annotations.
-* The **annotation** panel displays a single annotation.
+* ウィジェットは、アノテーターのオン / オフの切り替えや、保存されているすべての注釈のリストの表示に使用します。
+*  **annotation-editor** パネルでは、ユーザーが新しい注釈を入力することができます。* **annotation-list** パネルは、保存されているすべての注釈のリストを表示します。
+* **annotation** パネルは、個別の注釈のみを表示します。
 
-Additionally, we use the `notifications` module to notify the user when the
-add-on's storage quota is full.
+またここでは、アドオンのストレージクオータが一杯になったときに、`notifications` モジュールを使用してユーザーに通知します。
 
-## Working with the DOM ##
+## DOM の操作 ##
 
-We'll use two page-mods to interact with the DOMs of pages that the user has
-opened.
+ユーザーが開いたページの DOM とのやりとりには、次の 2 つの page-mod を使用します。
 
-* The **selector** enables the user to choose an element to annotate.
-It identifies page elements which are eligible for annotation, highlights them
-on mouseover, and tells the main add-on code when the user clicks a highlighted
-element.
+* **セレクタ** は、ユーザーが注釈を付ける要素を選択できるようにする page-mod です。注釈可能なページ要素を識別し、ユーザーがそれらにマウスを合わせたときにハイライトし、ハイライトされた要素をユーザーがクリックするとそれをメインのアドオンコードに通知します。
 
-* The **matcher** is responsible for finding annotated elements: it is
-initialized with the list of annotations and searches web pages for the
-elements they are associated with. It highlights any annotated elements that
-are found. When the user moves the mouse over an annotated element
-the matcher tells the main add-on code, which displays the annotation panel.
+* **マッチャー** は、注釈が付けられた要素を検索する page-mod です。注釈のリストを初期化し、Web ページでそれらの注釈が関連付けられている要素を検索します。また検出された注釈付きの要素をハイライトします。ユーザーが注釈付きの要素にマウスを合わせると、マッチャーはそれをアドオンのメインコードに通知し、メインコードが annotation パネルを表示します。
 
-## Working with Data ##
+## データの操作 ##
 
-We'll use the `simple-storage` module to store annotations.
+注釈の保存には、`simple-storage` モジュールを使用します。
 
-Because we are recording potentially sensitive information, we want to prevent
-the user creating annotations when in private browsing mode, so we'll use the
-`private-browsing` module for that.
+潜在的に機密性の高い情報を記録するので、ユーザーによるプライベートブラウジングモードでの注釈作成を禁止します。この処理には、`private-browsing` モジュールを使用します。
 
-## Getting Started ##
+## 開始のための手順 ##
 
 
-Let's get started by creating a directory called "annotator". Navigate to it
-and type `cfx init`.
+まず「annotator」というディレクトリを作成し、そのディレクトリに移動して `cfx init` と入力します。
 
-Next, we will implement the
-[widget](dev-guide/tutorials/annotator/widget.html).
+次のチュートリアルでは、[ウィジェット](dev-guide/tutorials/annotator/widget.html)を実装します。

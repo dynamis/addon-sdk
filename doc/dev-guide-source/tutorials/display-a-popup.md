@@ -2,44 +2,32 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Display a Popup #
+# ポップアップの表示 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ [SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To display a popup dialog, use the
-[`panel`](packages/addon-kit/panel.html) module. A panel's content is
-defined using HTML. You can run content scripts in the panel: although the
-script running in the panel can't directly access your main add-on code,
-you can exchange messages between the panel script and the add-on code.
+ポップアップダイアログを表示するには、[`panel`](packages/addon-kit/panel.html) モジュールを使用します。パネルの内容は、HTML を使用して定義します。パネル内ではコンテンツスクリプトを実行することができます。パネル内で実行したスクリプトはメインのアドオンコードに直接アクセスすることはできませんが、パネルスクリプトとアドオンコードの間でメッセージを交換することは可能です。
 
 <img class="image-right" src="static-files/media/screenshots/text-entry-panel.png"
 alt="Text entry panel">
 
-In this tutorial we'll create an add-on that
-[adds a widget to the toolbar](dev-guide/tutorials/adding-toolbar-button.html)
-which displays a panel when clicked.
+このチュートリアルでは、クリックしたときにパネルが表示される[ウィジェットをツールバーに追加](dev-guide/tutorials/adding-toolbar-button.html)するアドオンを作成します。
 
-The panel just contains a
-`<textarea>` element: when the user presses the `return` key, the contents
-of the `<textarea>` is sent to the main add-on code.
+パネルには `<textarea>` 要素のみが含まれ、ユーザーが `return` キーを押すと `<textarea>` の内容がメインのアドオンコードに送信されます。
 
-The main add-on code
-[logs the message to the console](dev-guide/tutorials/logging.html).
+メインのアドオンコードは、[メッセージをコンソールにログとして出力](dev-guide/tutorials/logging.html)します。
 
-The add-on consists of three files:
+このアドオンは、以下の 3 つのファイルで構成されています。 
 
-* **`main.js`**: the main add-on code, that creates the widget and panel
-* **`get-text.js`**: the content script that interacts with the panel content
-* **`text-entry.html`**: the panel content itself, specified as HTML
+* **`main.js`**：メインのアドオンコード。ウィジェットとパネルを作成します。
+* **`get-text.js`**：コンテンツスクリプト。パネルの内容とやりとりします。
+* **`text-entry.html`**：HTML で指定されたパネルの内容そのものです。
 
 <div style="clear:both"></div>
 
-The "main.js" looks like this:
+"main.js" は、以下のようになります。
 
     var data = require("self").data;
 
@@ -79,7 +67,7 @@ The "main.js" looks like this:
       text_entry.hide();
     });
 
-The content script "get-text.js" looks like this:
+コンテンツスクリプト "get-text.js" は、以下のようになります。
 
     // When the user hits return, send the "text-entered"
     // message to main.js.
@@ -88,7 +76,7 @@ The content script "get-text.js" looks like this:
     textArea.addEventListener('keyup', function onkeyup(event) {
       if (event.keyCode == 13) {
         // Remove the newline.
-        text = textArea.value.replace(/(\r\n|\n|\r)/gm,"");
+        text = textArea.value.replace(/(¥r¥n|¥n|¥r)/gm,"");
         self.port.emit("text-entered", text);
         textArea.value = '';
       }
@@ -104,7 +92,7 @@ The content script "get-text.js" looks like this:
       textArea.focus();
     });
 
-Finally, the "text-entry.html" file defines the `<textarea>` element:
+最後に、「text-entry.html」では `<textarea>` 要素を定義します。
 
 <pre class="brush: html">
 
@@ -126,8 +114,7 @@ Finally, the "text-entry.html" file defines the `<textarea>` element:
 
 </pre>
 
-Try it out: "main.js" is saved in your add-on's `lib` directory,
-and the other two files go in your add-on's `data` directory:
+演習：以下のように、「main.js」をアドオンの `lib` ディレクトリに保存し、他の 2 つのファイルをアドオンの `data` ディレクトリに保存します。
 
 <pre>
 my-addon/
@@ -138,14 +125,11 @@ my-addon/
              main.js
 </pre>
 
-Run the add-on, click the widget, and you should see the panel.
-Type some text and press "return" and you should see the output
-in the console.
+アドオンを実行し、ウィジェットをクリックすると、パネルが表示されます。
+任意のテキストを入力し、Return キーを押すと、コンソールに出力されます。
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about the `panel` module, see the
-[`panel` API reference](packages/addon-kit/panel.html).
+`panel` モジュールの詳細については、[API リファレンス：`panel`（英語）](packages/addon-kit/panel.html)を参照してください。
 
-To learn more about attaching panels to widgets, see the
-[`widget` API reference](packages/addon-kit/widget.html).
+ウィジェットにパネルを付加する方法の詳細については、[API リファレンス：`widget`（英語）](packages/addon-kit/widget.html)を参照してください。

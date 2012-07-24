@@ -2,22 +2,15 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-# Add a Context Menu Item #
+# コンテキストメニューアイテムの追加 #
 
 <span class="aside">
-To follow this tutorial you'll need to have
-[installed the SDK](dev-guide/tutorials/installation.html)
-and learned the
-[basics of `cfx`](dev-guide/tutorials/getting-started-with-cfx.html).
+このチュートリアルに沿って学習するには、あらかじめ[SDK をインストール](dev-guide/tutorials/installation.html)し、[`cfx` 入門](dev-guide/tutorials/getting-started-with-cfx.html)を学習してください。
 </span>
 
-To add items and submenus to the Firefox context menu, use the
-[`context-menu`](packages/addon-kit/context-menu.html) module.
+Firefox のコンテキストメニューにアイテムやサブメニューを追加するには、[`context-menu`](packages/addon-kit/context-menu.html) モジュールを使用します。
 
-Here's an add-on that adds a new context menu item. The item is
-displayed whenever something in the page is selected. When it's
-clicked, the selection is sent to the main add-on code, which just
-logs it:
+以下は、コンテキストメニューアイテムを新しく追加するアドオンです。このアイテムは、ページ内で任意の要素を選択したときに表示されます。このアイテムをクリックすると、選択した内容がメインのアドオンコードに送信されてログに記録されます。
 
     var menuItem = contextMenu.Item({
       label: "Log Selection",
@@ -31,58 +24,43 @@ logs it:
       }
     });
 
-Try it: run the add-on, load a web page, select some text and right-click.
-You should see the new item appear:
+演習：上のアドオンを実行した後、Web ページをロードし、任意のテキスト文字列を選択して右クリックしてください。
+以下の図のように、新しいアイテムが表示されます。
 
 <img class="image-center" src="static-files/media/screenshots/context-menu-selection.png"></img>
 
-Click it, and the selection is
-[logged to the console](dev-guide/tutorials/logging.html):
+このアイテムをクリックすると、選択した文字列が[コンソールにログとして出力](dev-guide/tutorials/logging.html)されます。
 
 <pre>
 info: elephantine lizard
 </pre>
 
-All this add-on does is to construct a context menu item. You don't need
-to add it: once you have constructed the item, it is automatically added
-in the correct context. The constructor in this case takes four options:
-`label`, `context`, `contentScript`, and `onMessage`.
+このアドオンが行うのは、コンテキストメニューアイテムの作成だけであって、作成したコンテキストメニューアイテムを追加する必要はありません。メニューアイテムを作成するだけで、適切なコンテキストに自動的にそのアイテムが追加されるからです。上のアドオンでは、コンストラクタが、`label`、`context`、`contentScript`、`onMessage` の 4 つのオプションを取っています。
 
 ### label ###
 
-The `label` is just the string that's displayed.
+`label` は、アイテムとして表示される文字列です。
 
 ### context ###
 
-The `context` describes the circumstances in which the item should be
-shown. The `context-menu` module provides a number of simple built-in
-contexts, including this `SelectionContext()`, which means: display
-the item when something on the page is selected.
+`context` は、メニューアイテムをどのような状況で表示するかを指定します。`context-menu` モジュールには、単純なコンテキストがいくつか内蔵されています。ここで使用した `SelectionContext()` はその 1 つで、「ページで何らかの要素を選択したときにアイテムを表示する」ことを意味します。
 
-If these simple contexts aren't enough, you can define more sophisticated
-contexts using scripts.
+単純なコンテキストだけでは不十分な場合、スクリプトを使用してさらに高度なコンテキストを定義できます。
 
 ### contentScript ###
 
-This attaches a script to the item. In this case the script listens for
-the user to click on the item, then sends a message to the add-on containing
-the selected text.
+このオプションは、アイテムにスクリプトを結合します。上のアドオンの場合、スクリプトは、ユーザーがアイテムをクリックするのをリッスンし、選択したテキストが入ったメッセージをアドオンに送信します。
 
 ### onMessage ###
 
-The `onMessage` property provides a way for the add-on code to respond to
-messages from the script attached to the context menu item. In this case
-it just logs the selected text.
+`onMessage` プロパティは、コンテキストメニューアイテムに結合されたスクリプトからのメッセージを、アドオンコード側のハンドラ関数を指定します。上のスクリプトでは、選択したテキストがログに記録されます。
 
-So:
+つまり、以下のように処理が実行されます。
 
-1. the user clicks the item
-2. the content script's `click` event fires, and the content script retrieves
-the selected text and sends a message to the add-on
-3. the add-on's `message` event fires, and the add-on code's handler function
-is passed the selected text, which it logs
+1. ユーザーがアイテムをクリックします。
+2. コンテンツスクリプトの `click` イベントが起動し、選択したテキストがコンテンツスクリプトによって取得され、メッセージがアドオンに送信されます。
+3. アドオンの `message` イベントが起動し、選択したテキストがアドオンコードのハンドラ関数に渡され、ログに記録されます。
 
-## Learning More ##
+## さらに詳しく ##
 
-To learn more about the `context-menu` module, see the
-[`context-menu` API reference](packages/addon-kit/context-menu.html).
+`context-menu` モジュールの詳細については、[API リファレンス:`context-menu`（英語）] (packages/addon-kit/context-menu.html)を参照してください。
