@@ -2,14 +2,14 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 
-<h2 class="top">Welcome to the Add-on SDK!</h2>
+<h2 class="top">Add-on SDK 開発者ガイド</h2>
 
 Using the Add-on SDK you can create Firefox add-ons using standard Web
 technologies: JavaScript, HTML, and CSS. The SDK includes JavaScript APIs which you can use to create add-ons, and tools for creating, running, testing, and packaging add-ons.
 
 <hr>
 
-## <a href="dev-guide/tutorials/index.html">Tutorials</a> ##
+## <a href="dev-guide/tutorials/index.html"> チュートリアル </a> ##
 
 <table class="catalog">
 <colgroup>
@@ -18,50 +18,49 @@ technologies: JavaScript, HTML, and CSS. The SDK includes JavaScript APIs which 
 </colgroup>
   <tr>
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#getting-started">Getting started</a></h4>
+      <h4><a href="dev-guide/tutorials/index.html#getting-started">はじめに</a></h4>
       How to
-      <a href="dev-guide/tutorials/installation.html">install the SDK</a> and
-      <a href="dev-guide/tutorials/getting-started-with-cfx.html">use the cfx
-      tool</a> to develop, test, and package add-ons.
+      <a href="dev-guide/tutorials/installation.html">SDK のインストール</a> and
+      <a href="dev-guide/tutorials/getting-started-with-cfx.html">cfx ツール入門</a> to develop, test, and package add-ons.
     </td>
 
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#create-user-interfaces">Create user interface components</a></h4>
+      <h4><a href="dev-guide/tutorials/index.html#create-user-interfaces">ユーザーインターフェイスの作成</a></h4>
       Create user interface components such as
-        <a href="dev-guide/tutorials/adding-toolbar-button.html">toolbar buttons</a>,
-        <a href="dev-guide/tutorials/adding-menus.html">menu items</a>, and
-        <a href="dev-guide/tutorials/display-a-popup.html">dialogs</a>
+        <a href="dev-guide/tutorials/adding-toolbar-button.html">ツールバーボタン</a>,
+        <a href="dev-guide/tutorials/adding-menus.html">メニューアイテム</a>, and
+        <a href="dev-guide/tutorials/display-a-popup.html">ダイアログ</a>
     </td>
   </tr>
 
   <tr>
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#interact-with-the-browser">Interact with the browser</a></h4>
-      <a href="dev-guide/tutorials/open-a-web-page.html">Open web pages</a>,
-      <a href="dev-guide/tutorials/listen-for-page-load.html">listen for pages loading</a>, and
-      <a href="dev-guide/tutorials/list-open-tabs.html">list open pages</a>.
+      <h4><a href="dev-guide/tutorials/index.html#interact-with-the-browser">ブラウザの操作</a></h4>
+      <a href="dev-guide/tutorials/open-a-web-page.html">Web ページを開く</a>,
+      <a href="dev-guide/tutorials/listen-for-page-load.html">ページ読み込みのリッスン</a>, and
+      <a href="dev-guide/tutorials/list-open-tabs.html">開いているタブの一覧表示</a>.
     </td>
 
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#modify-web-pages">Modify web pages</a></h4>
-      <a href="dev-guide/tutorials/modifying-web-pages-url.html">Modify pages matching a URL pattern</a>
-      or <a href="dev-guide/tutorials/modifying-web-pages-tab.html">dynamically modify a particular tab</a>.
+      <h4><a href="dev-guide/tutorials/index.html#modify-web-pages">Web ページの変更</a></h4>
+      <a href="dev-guide/tutorials/modifying-web-pages-url.html">URL に基づいた Web ページの変更</a>
+      or <a href="dev-guide/tutorials/modifying-web-pages-tab.html">アクティブな Web ページの変更</a>.
     </td>
   </tr>
 
   <tr>
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#development-techniques">Development techniques</a></h4>
+      <h4><a href="dev-guide/tutorials/index.html#development-techniques">開発テクニック</a></h4>
 Learn about common development techniques, such as
-<a href="dev-guide/tutorials/unit-testing.html">unit testing</a>,
-<a href="dev-guide/tutorials/logging.html">logging</a>,
-<a href="dev-guide/tutorials/reusable-modules.html">creating reusable modules</a>,
-<a href="dev-guide/tutorials/l10n.html">localization</a>, and
-<a href="dev-guide/tutorials/mobile.html">mobile development</a>.
+<a href="dev-guide/tutorials/unit-testing.html">単体テスト</a>,
+<a href="dev-guide/tutorials/logging.html">ログとして出力</a>,
+<a href="dev-guide/tutorials/reusable-modules.html">サードパーティモジュールの作成</a>,
+<a href="dev-guide/tutorials/l10n.html">ローカリゼーション</a>, and
+<a href="dev-guide/tutorials/mobile.html">モバイル開発</a>.
     </td>
 
     <td>
-      <h4><a href="dev-guide/tutorials/index.html#putting-it-together">Putting it together</a></h4>
+      <h4><a href="dev-guide/tutorials/index.html#putting-it-together">応用</a></h4>
       Walkthrough of the <a href="dev-guide/tutorials/annotator/index.html">Annotator</a> example add-on.
     </td>
   </tr>
